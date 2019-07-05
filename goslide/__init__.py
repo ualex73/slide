@@ -20,7 +20,7 @@ COMPONENT = 'cover'
 API = 'api'
 SLIDES = 'slides'
 
-DEFAULT_SCAN_INTERVAL = datetime.timedelta(seconds=10)
+DEFAULT_SCAN_INTERVAL = datetime.timedelta(seconds=30)
 
 CONFIG_SCHEMA = vol.Schema({
     DOMAIN: vol.Schema({
