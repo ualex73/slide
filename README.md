@@ -32,7 +32,8 @@ Configuration variables:
 
 It is possible to debug the GoSlide component and API library, this can be done by adding the following lines to the `configuration.yaml` file:
 
-```logger:
+```yaml
+logger:
   logs:
     goslideapi: debug
     homeassistant.components.goslide: debug
