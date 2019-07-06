@@ -2,10 +2,12 @@
 
 import logging
 
+from homeassistant.util import slugify
 from homeassistant.components.cover import (
-    ATTR_POSITION, SUPPORT_CLOSE, SUPPORT_OPEN, SUPPORT_SET_POSITION,
-    SUPPORT_STOP, DEVICE_CLASS_CURTAIN, CoverDevice)
-#from . import DOMAIN, GoSlideEntity
+    ENTITY_ID_FORMAT,
+    SUPPORT_CLOSE, SUPPORT_OPEN, SUPPORT_SET_POSITION, SUPPORT_STOP, 
+    STATE_OPEN, STATE_CLOSED, STATE_OPENING, STATE_CLOSING,
+    DEVICE_CLASS_CURTAIN, CoverDevice)
 from . import (DOMAIN, SLIDES, API)
 
 _LOGGER = logging.getLogger(__name__)
@@ -35,12 +37,30 @@ class GoSlideCover(CoverDevice):
     @property
     def entity_id(self):
         """Return the entity id of the cover."""
-        return 'cover.goslide_' + self._mac.lower()
+        return ENTITY_ID_FORMAT.format(slugify('goslide_' + self._mac.lower()))
 
     @property
     def name(self):
         """Return the name of the cover."""
         return self._name
+
+    @property
+    def state(self):
+        """Return the state of the cover."""
+
+        if self._hass.data[DOMAIN][SLIDES][self._mac]['pos'] == None:
+            return None
+        else:
+            pos = int(self._hass.data[DOMAIN][SLIDES][self._mac]['pos'] * 100)
+            if pos > 95:
+                return STATE_CLOSED
+            else:
+                return STATE_OPEN
+
+    #@property
+    #def available(self):
+    #    """Return True if entity is available."""
+    #    return self._available
 
     @property
     def is_closed(self):
@@ -72,15 +92,13 @@ class GoSlideCover(CoverDevice):
     @property
     def current_cover_position(self):
         """Return the current position of cover shutter."""
-        position = None
-        if 'pos' in self._hass.data[DOMAIN][SLIDES][self._mac]:
-            position = int(self._hass.data[DOMAIN][SLIDES][self._mac]['pos'] * 100)
-            if position > 100:
-                position = 100
-            if position < 0:
-                position = 0
 
-        return position
+        if self._hass.data[DOMAIN][SLIDES][self._mac]['pos'] == None:
+            pos = None
+        else:
+            pos = int(self._hass.data[DOMAIN][SLIDES][self._mac]['pos'] * 100)
+
+        return pos
 
     @property
     def device_class(self):
@@ -91,5 +109,4 @@ class GoSlideCover(CoverDevice):
         """Flag supported features."""
         return SUPPORT_OPEN | SUPPORT_CLOSE | \
             SUPPORT_SET_POSITION | SUPPORT_STOP
-
 

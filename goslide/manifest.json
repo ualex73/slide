@@ -6,5 +6,5 @@
       "goslide-api==0.0.2"
     ],
     "dependencies": [],
-    "codeowners": ['ualex73']
+    "codeowners": ["ualex73"]
   }

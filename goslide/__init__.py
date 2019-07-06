@@ -56,7 +56,12 @@ async def async_setup(hass, config):
                 hass.data[DOMAIN][SLIDES][uid]['id'] = slide['id']
                 hass.data[DOMAIN][SLIDES][uid]['name'] = slide['device_name']
                 hass.data[DOMAIN][SLIDES][uid]['pos'] = slide['device_info']['pos']
-                
+
+                if hass.data[DOMAIN][SLIDES][uid]['pos'] != None:
+                    if hass.data[DOMAIN][SLIDES][uid]['pos'] < 0:
+                        hass.data[DOMAIN][SLIDES][uid]['pos'] = 0
+                    elif hass.data[DOMAIN][SLIDES][uid]['pos'] > 1:
+                        hass.data[DOMAIN][SLIDES][uid]['pos'] = 1
             else:
                 _LOGGER.error('Found invalid goslide entry, "device_id" is missing') 
 

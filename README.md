@@ -28,7 +28,19 @@ Configuration variables:
 - **password** (*Required*): The password of your account with api.goslide.io
 - **scan_interval** (*Optional*): Number of seconds between polls. (default = 30)
 
+### Debugging
+
+It is possible to debug the GoSlide component and API library, this can be done by adding the following lines to the `configuration.yaml` file:
+
+```logger:
+  logs:
+    goslideapi: debug
+    homeassistant.components.goslide: debug
+```
+
 ### TO DO
 
 - Improve error handling
+- Improve debugging
 - Add local API support, when released
+
