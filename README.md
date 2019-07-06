@@ -1,6 +1,6 @@
 # Home-Assistant Custom Component for Go Slide
 
-My custom component home-assistant (http://www.home-assistant.io) to control the Go Slide (https://nl.goslide.io). At this moment the component only support the Cloud option, because the local API hasn't been released yet (it planned to be included when released).
+This custom component home-assistant (http://www.home-assistant.io) can control the Go Slide (https://nl.goslide.io). At this moment the component only support the Cloud option, because the local API hasn't been released yet (it planned to be included when released).
 
 ## Go Slide
 
