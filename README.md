@@ -28,3 +28,7 @@ Configuration variables:
 - **password** (*Required*): The password of your account with api.goslide.io
 - **scan_interval** (*Optional*): Number of seconds between polls. (default = 30)
 
+### TO DO
+
+- Improve error handling
+- Add local API support, when released
