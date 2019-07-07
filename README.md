@@ -36,6 +36,7 @@ It is possible to debug the GoSlide component and API library, this can be done 
 logger:
   logs:
     goslideapi: debug
+    custom_components.goslide: debug
     homeassistant.components.goslide: debug
 ```
 

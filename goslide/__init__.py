@@ -1,26 +1,20 @@
 """Component for the Go Slide API."""
 
 import logging
-import datetime
+from datetime import timedelta
 
 import voluptuous as vol
 
-from homeassistant.const import (CONF_USERNAME, CONF_PASSWORD, CONF_SCAN_INTERVAL)
-from homeassistant.helpers import discovery
+from homeassistant.const import CONF_USERNAME, CONF_PASSWORD, \
+                                CONF_SCAN_INTERVAL
 from homeassistant.helpers import config_validation as cv
-from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.discovery import async_load_platform
-from homeassistant.helpers.entity import Entity
-from homeassistant.util import Throttle
+from homeassistant.helpers.event import async_track_time_interval
+from .const import (DOMAIN, SLIDES, API, COMPONENT)
 
 _LOGGER = logging.getLogger(__name__)
 
-DOMAIN = 'goslide'
-COMPONENT = 'cover'
-API = 'api'
-SLIDES = 'slides'
-
-DEFAULT_SCAN_INTERVAL = datetime.timedelta(seconds=30)
+DEFAULT_SCAN_INTERVAL = timedelta(seconds=30)
 
 CONFIG_SCHEMA = vol.Schema({
     DOMAIN: vol.Schema({
@@ -31,39 +25,43 @@ CONFIG_SCHEMA = vol.Schema({
     })
 }, extra=vol.ALLOW_EXTRA)
 
+
 async def async_setup(hass, config):
     """Set up the GoSlide platform."""
-
     async def update_slides(now):
-        
+        """Update slide information."""
         result = await hass.data[DOMAIN][API].slidesoverview()
 
-        if result == None:
-            _LOGGER.error('GoSlide API does not work or returned an error')
+        if result is None:
+            _LOGGER.error("GoSlide API does not work or returned an error")
             return
 
-        """Set the pos to None first, otherwise we don't know if the API fails."""
+        if result:
+            _LOGGER.debug("GoSlide API returned %d slide(s)", len(result))
+        else:
+            _LOGGER.warning("GoSlide API returned 0 slides")
+
         for key in hass.data[DOMAIN][SLIDES]:
             hass.data[DOMAIN][SLIDES][key]['pos'] = None
 
         for slide in result:
             if 'device_id' in slide:
-                """Found a valid slide entry, remove 'slide_' from the id, we keep the MAC..."""
                 uid = slide['device_id'].replace('slide_', '')
-                if uid not in hass.data[DOMAIN][SLIDES]:
-                    hass.data[DOMAIN][SLIDES][uid] = {}
-                hass.data[DOMAIN][SLIDES][uid]['mac'] = uid
-                hass.data[DOMAIN][SLIDES][uid]['id'] = slide['id']
-                hass.data[DOMAIN][SLIDES][uid]['name'] = slide['device_name']
-                hass.data[DOMAIN][SLIDES][uid]['pos'] = slide['device_info']['pos']
+                slidenew = {}
+                slidenew['mac'] = uid
+                slidenew['id'] = slide['id']
+                slidenew['name'] = slide['device_name']
+                slidenew['pos'] = slide['device_info']['pos']
+                hass.data[DOMAIN][SLIDES][uid] = slidenew
 
-                if hass.data[DOMAIN][SLIDES][uid]['pos'] != None:
+                if hass.data[DOMAIN][SLIDES][uid]['pos'] is not None:
                     if hass.data[DOMAIN][SLIDES][uid]['pos'] < 0:
                         hass.data[DOMAIN][SLIDES][uid]['pos'] = 0
                     elif hass.data[DOMAIN][SLIDES][uid]['pos'] > 1:
                         hass.data[DOMAIN][SLIDES][uid]['pos'] = 1
             else:
-                _LOGGER.error('Found invalid goslide entry, "device_id" is missing') 
+                _LOGGER.error("Found invalid GoSlide entry, 'device_id' is "
+                              "missing. Entry=%s", slide)
 
     if DOMAIN not in config:
         return True
@@ -81,19 +79,20 @@ async def async_setup(hass, config):
 
     result = await hass.data[DOMAIN][API].login()
 
-    if result == None:
-        _LOGGER.error('Unknown error')
+    if result is None:
+        _LOGGER.error("GoSlide API returned unknown error during "
+                      "authentication")
         return False
-    elif result == False:
-        _LOGGER.error('Authentication failed')
+    elif result is False:
+        _LOGGER.error("GoSlide authentication failed, check "
+                      "username/password")
         return False
 
     await update_slides(None)
 
     hass.async_create_task(
-        discovery.async_load_platform(hass, COMPONENT, DOMAIN, {}, config))
+        async_load_platform(hass, COMPONENT, DOMAIN, {}, config))
 
     async_track_time_interval(hass, update_slides, scaninterval)
 
     return True
-
