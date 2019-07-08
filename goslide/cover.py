@@ -37,6 +37,7 @@ class GoSlideCover(CoverDevice):
         self._name = slide['name']
         self._entity_id = ENTITY_ID_FORMAT.format(slugify('goslide_' +
                                                           self._mac))
+        self._is_closed = None
 
     @property
     def entity_id(self):
@@ -57,15 +58,19 @@ class GoSlideCover(CoverDevice):
             pos = int(self._hass.data[DOMAIN][SLIDES][self._mac]['pos'] * 100)
             if pos > 95:
                 value = STATE_CLOSED
+                if self._is_closed is None:
+                    self._is_closed = True
             else:
                 value = STATE_OPEN
+                if self._is_closed is None:
+                    self._is_closed = False
 
         return value
 
     @property
     def is_closed(self):
-        """Return if the cover is closed."""
-        return None
+        """Return if the cover is closed. Used by cover.toggle."""
+        return self._is_closed
 
     @property
     def assumed_state(self):
@@ -95,10 +100,12 @@ class GoSlideCover(CoverDevice):
 
     async def async_open_cover(self, **kwargs):
         """Open the cover."""
+        self._is_closed = False
         await self._hass.data[DOMAIN][API].slideopen(self._id)
 
     async def async_close_cover(self, **kwargs):
         """Close the cover."""
+        self._is_closed = True
         await self._hass.data[DOMAIN][API].slideclose(self._id)
 
     async def async_stop_cover(self, **kwargs):
@@ -108,4 +115,9 @@ class GoSlideCover(CoverDevice):
     async def async_set_cover_position(self, position):
         """Move the cover to a specific position."""
         position = position / 100
+
+        if self._hass.data[DOMAIN][SLIDES][self._mac]['pos'] is not None:
+            self._is_closed = position > \
+                self._hass.data[DOMAIN][SLIDES][self._mac]['pos']
+
         await self._hass.data[DOMAIN][API].slidesetposition(self._id, position)
