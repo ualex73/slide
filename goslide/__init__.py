@@ -45,23 +45,44 @@ async def async_setup(hass, config):
             hass.data[DOMAIN][SLIDES][key]['pos'] = None
 
         for slide in result:
-            if 'device_id' in slide:
-                uid = slide['device_id'].replace('slide_', '')
-                slidenew = {}
-                slidenew['mac'] = uid
-                slidenew['id'] = slide['id']
-                slidenew['name'] = slide['device_name']
-                slidenew['pos'] = slide['device_info']['pos']
-                hass.data[DOMAIN][SLIDES][uid] = slidenew
-
-                if hass.data[DOMAIN][SLIDES][uid]['pos'] is not None:
-                    if hass.data[DOMAIN][SLIDES][uid]['pos'] < 0:
-                        hass.data[DOMAIN][SLIDES][uid]['pos'] = 0
-                    elif hass.data[DOMAIN][SLIDES][uid]['pos'] > 1:
-                        hass.data[DOMAIN][SLIDES][uid]['pos'] = 1
-            else:
+            if 'device_id' not in slide:
                 _LOGGER.error("Found invalid GoSlide entry, 'device_id' is "
                               "missing. Entry=%s", slide)
+                continue
+
+            uid = slide['device_id'].replace('slide_', '')
+            slidenew = {}
+            slidenew['mac'] = uid
+            slidenew['id'] = slide['id']
+            slidenew['name'] = slide['device_name']
+
+            if 'device_info' not in slide:
+                _LOGGER.error("Slide %s (%s) has no 'device_info' Entry=%s",
+                              slide['id'], slidenew['mac'], slide)
+                continue
+
+            # Check if we have 'pos' (OK) or 'code' (NOK)
+            if 'pos' in slide['device_info']:
+                slidenew['online'] = True
+                slidenew['pos'] = slide['device_info']['pos']
+                if slidenew['pos'] < 0:
+                    slidenew['pos'] = 0
+                elif slidenew['pos'] > 1:
+                    slidenew['pos'] = 1
+            elif 'code' in slide['device_info']:
+                slidenew['online'] = False
+                _LOGGER.warning("Slide %s (%s) is offline with "
+                                "code=%s",
+                                slide['id'], slidenew['mac'],
+                                slide['device_info']['code'])
+            else:
+                slidenew['online'] = False
+                _LOGGER.error("Slide %s (%s) has invalid 'device_info'"
+                              " %s", slide['id'], slidenew['mac'],
+                              slide['device_info'])
+
+            hass.data[DOMAIN][SLIDES][uid] = slidenew
+            _LOGGER.debug("Updated entry=%s", slidenew)
 
     if DOMAIN not in config:
         return True

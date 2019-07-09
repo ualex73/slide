@@ -6,7 +6,7 @@ from homeassistant.util import slugify
 from homeassistant.components.cover import (
     ENTITY_ID_FORMAT, SUPPORT_CLOSE, SUPPORT_OPEN, SUPPORT_SET_POSITION,
     SUPPORT_STOP, STATE_OPEN, STATE_CLOSED, DEVICE_CLASS_CURTAIN, CoverDevice)
-from .const import (DOMAIN, SLIDES, API)
+from .const import (API, DOMAIN, SLIDES)
 
 _LOGGER = logging.getLogger(__name__)
 
