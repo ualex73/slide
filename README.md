@@ -4,6 +4,9 @@ This custom component home-assistant (http://www.home-assistant.io) can control 
 
 ## Go Slide
 
+### Requirements
+- Home Assistant 0.94+
+
 ### Installation
 
 - Copy directory `goslide` `<config dir>/custom_components` directory.
