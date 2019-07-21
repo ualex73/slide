@@ -11,6 +11,7 @@ from .const import (API, DOMAIN, SLIDES)
 _LOGGER = logging.getLogger(__name__)
 
 
+# pylint: disable=unused-argument
 async def async_setup_platform(hass,
                                config,
                                async_add_entities,
