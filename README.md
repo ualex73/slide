@@ -30,6 +30,7 @@ Configuration variables:
 - **username** (*Required*): The e-mail used to register your account with api.goslide.io, with your iPhone/Android App
 - **password** (*Required*): The password of your account with api.goslide.io
 - **scan_interval** (*Optional*): Number of seconds between polls. (default = 30)
+- **timeout** (*Optional*): Maximum number of seconds between start and end of HTTPS request. (default = 30)
 - **retry** (*Optional*): Number of seconds between startup retry (if API is down). (default = 120)
 
 ### Debugging
