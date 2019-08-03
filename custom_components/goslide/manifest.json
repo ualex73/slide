@@ -3,7 +3,7 @@
   "name": "Go Slide",
   "documentation": "https://www.home-assistant.io/components/goslide",
   "requirements": [
-    "goslide-api==0.2.0"
+    "goslide-api==0.2.1"
   ],
   "dependencies": [],
   "codeowners": [

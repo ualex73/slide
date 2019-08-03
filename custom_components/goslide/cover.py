@@ -4,24 +4,28 @@ import logging
 
 from homeassistant.util import slugify
 from homeassistant.components.cover import (
-    ENTITY_ID_FORMAT, SUPPORT_CLOSE, SUPPORT_OPEN, SUPPORT_SET_POSITION,
-    SUPPORT_STOP, STATE_OPEN, STATE_CLOSED, DEVICE_CLASS_CURTAIN, CoverDevice)
-from .const import (API, DOMAIN, SLIDES)
+    ENTITY_ID_FORMAT,
+    SUPPORT_CLOSE,
+    SUPPORT_OPEN,
+    SUPPORT_SET_POSITION,
+    SUPPORT_STOP,
+    STATE_OPEN,
+    STATE_CLOSED,
+    DEVICE_CLASS_CURTAIN,
+    CoverDevice,
+)
+from .const import API, DOMAIN, SLIDES
 
 _LOGGER = logging.getLogger(__name__)
 
 
 # pylint: disable=unused-argument
-async def async_setup_platform(hass,
-                               config,
-                               async_add_entities,
-                               discovery_info=None):
+async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up cover(s) for Go Slide platform."""
     entities = []
 
     for key in hass.data[DOMAIN][SLIDES]:
-        _LOGGER.debug("Setting up GoSlide entity: %s",
-                      hass.data[DOMAIN][SLIDES][key])
+        _LOGGER.debug("Setting up GoSlide entity: %s", hass.data[DOMAIN][SLIDES][key])
         entities.append(GoSlideCover(hass, hass.data[DOMAIN][SLIDES][key]))
 
     async_add_entities(entities)
@@ -33,11 +37,10 @@ class GoSlideCover(CoverDevice):
     def __init__(self, hass, slide):
         """Initialize the cover."""
         self._hass = hass
-        self._mac = slide['mac']
-        self._id = slide['id']
-        self._name = slide['name']
-        self._entity_id = ENTITY_ID_FORMAT.format(slugify('goslide_' +
-                                                          self._mac))
+        self._mac = slide["mac"]
+        self._id = slide["id"]
+        self._name = slide["name"]
+        self._entity_id = ENTITY_ID_FORMAT.format(slugify("goslide_" + self._mac))
         self._is_closed = None
 
     @property
@@ -55,8 +58,8 @@ class GoSlideCover(CoverDevice):
         """Return the state of the cover."""
         value = None
 
-        if self._hass.data[DOMAIN][SLIDES][self._mac]['pos'] is not None:
-            pos = int(self._hass.data[DOMAIN][SLIDES][self._mac]['pos'] * 100)
+        if self._hass.data[DOMAIN][SLIDES][self._mac]["pos"] is not None:
+            pos = int(self._hass.data[DOMAIN][SLIDES][self._mac]["pos"] * 100)
             if pos > 95:
                 value = STATE_CLOSED
                 if self._is_closed is None:
@@ -86,16 +89,15 @@ class GoSlideCover(CoverDevice):
     @property
     def supported_features(self):
         """Flag supported features."""
-        return SUPPORT_OPEN | SUPPORT_CLOSE | SUPPORT_SET_POSITION | \
-            SUPPORT_STOP
+        return SUPPORT_OPEN | SUPPORT_CLOSE | SUPPORT_SET_POSITION | SUPPORT_STOP
 
     @property
     def current_cover_position(self):
         """Return the current position of cover shutter."""
-        if self._hass.data[DOMAIN][SLIDES][self._mac]['pos'] is None:
+        if self._hass.data[DOMAIN][SLIDES][self._mac]["pos"] is None:
             pos = None
         else:
-            pos = int(self._hass.data[DOMAIN][SLIDES][self._mac]['pos'] * 100)
+            pos = int(self._hass.data[DOMAIN][SLIDES][self._mac]["pos"] * 100)
 
         return pos
 
@@ -117,8 +119,9 @@ class GoSlideCover(CoverDevice):
         """Move the cover to a specific position."""
         position = position / 100
 
-        if self._hass.data[DOMAIN][SLIDES][self._mac]['pos'] is not None:
-            self._is_closed = position > \
-                self._hass.data[DOMAIN][SLIDES][self._mac]['pos']
+        if self._hass.data[DOMAIN][SLIDES][self._mac]["pos"] is not None:
+            self._is_closed = (
+                position > self._hass.data[DOMAIN][SLIDES][self._mac]["pos"]
+            )
 
         await self._hass.data[DOMAIN][API].slidesetposition(self._id, position)
