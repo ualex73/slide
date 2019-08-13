@@ -50,7 +50,7 @@ async def async_setup(hass, config):
     """Set up the GoSlide platform."""
 
     # pylint: disable=unused-argument
-    async def update_slides(now):
+    async def update_slides(now=None):
         """Update slide information."""
         result = await hass.data[DOMAIN][API].slidesoverview()
 
@@ -133,6 +133,7 @@ async def async_setup(hass, config):
 
     hass.data[DOMAIN][API] = GoSlideCloud(username, password, timeout)
 
+    # pylint: disable=broad-except
     try:
         result = await hass.data[DOMAIN][API].login()
     except Exception as err:
@@ -141,6 +142,7 @@ async def async_setup(hass, config):
         async_call_later(hass, retry, async_setup(hass, config))
         return True
 
+    # pylint: disable=no-else-return
     if result is None:
         _LOGGER.error("GoSlide API returned unknown error during " "authentication")
         return False
@@ -148,10 +150,11 @@ async def async_setup(hass, config):
         _LOGGER.error("GoSlide authentication failed, check " "username/password")
         return False
 
-    await update_slides(None)
+    await update_slides()
 
     hass.async_create_task(async_load_platform(hass, COMPONENT, DOMAIN, {}, config))
 
     async_track_time_interval(hass, update_slides, scaninterval)
 
     return True
+
