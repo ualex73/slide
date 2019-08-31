@@ -1,7 +1,8 @@
 # Home-Assistant Custom Component for Slide
 
-*** NOTE - The component has been renamed from 'goslide' to 'slide' on request of 'Innovation in Motion' ***
-*** NOTE - Configuration items timeout and retry are removed ***
+* NOTE - The component has been renamed from 'goslide' to 'slide' on request of 'Innovation in Motion'
+
+* NOTE - Configuration items timeout and retry are removed
 
 This custom component home-assistant (http://www.home-assistant.io) can control the Slide (https://nl.goslide.io). At this moment the component only support the Cloud option, because the local API hasn't been released yet (it planned to be included when released).
 
