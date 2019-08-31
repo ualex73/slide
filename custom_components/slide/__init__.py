@@ -5,6 +5,8 @@ from datetime import timedelta
 
 import voluptuous as vol
 
+from goslideapi import GoSlideCloud
+
 from homeassistant.const import (
     CONF_USERNAME,
     CONF_PASSWORD,
@@ -17,14 +19,7 @@ from homeassistant.const import (
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.helpers.event import async_track_time_interval, async_call_later
-from .const import (
-    DOMAIN,
-    SLIDES,
-    API,
-    COMPONENT,
-    DEFAULT_RETRY,
-)
-from goslideapi import GoSlideCloud
+from .const import DOMAIN, SLIDES, API, COMPONENT, DEFAULT_RETRY
 
 _LOGGER = logging.getLogger(__name__)
 
