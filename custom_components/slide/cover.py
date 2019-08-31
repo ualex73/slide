@@ -2,7 +2,7 @@
 
 import logging
 
-from homeassistant.util import slugify
+from homeassistant.const import ATTR_ID, ATTR_FRIENDLY_NAME
 from homeassistant.components.cover import (
     ATTR_POSITION,
     ENTITY_ID_FORMAT,
@@ -41,18 +41,18 @@ class SlideCover(CoverDevice):
         self._api = api
         self._slide = slide
         self._id = slide["id"]
-        self._name = slide["name"]
-        self._entity_id = ENTITY_ID_FORMAT.format(slugify("slide_" + slide["mac"]))
+        self._unique_id = slide["mac"]
+        self._friendly_name = slide["name"]
 
     @property
-    def entity_id(self):
-        """Return the entity id of the cover."""
-        return self._entity_id
+    def unique_id(self):
+        """Return the device unique id."""
+        return self._unique_id
 
     @property
-    def name(self):
-        """Return the name of the cover."""
-        return self._name
+    def device_state_attributes(self):
+        """Return device specific state attributes."""
+        return {ATTR_ID: self._id, ATTR_FRIENDLY_NAME: self._friendly_name}
 
     @property
     def is_opening(self):
@@ -70,6 +70,11 @@ class SlideCover(CoverDevice):
         if self._slide["state"] is None:
             return None
         return self._slide["state"] == STATE_CLOSED
+
+    @property
+    def available(self):
+        """Return False if state is not available."""
+        return self._slide["online"]
 
     @property
     def assumed_state(self):

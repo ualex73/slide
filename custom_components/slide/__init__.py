@@ -73,6 +73,7 @@ async def async_setup(hass, config):
             slidenew["state"] = None
             oldpos = slidenew.get("pos", None)
             slidenew["pos"] = None
+            slidenew["online"] = False
 
             if "device_info" not in slide:
                 _LOGGER.error(
@@ -85,6 +86,7 @@ async def async_setup(hass, config):
 
             # Check if we have 'pos' (OK) or 'code' (NOK)
             if "pos" in slide["device_info"]:
+                slidenew["online"] = True
                 slidenew["pos"] = slide["device_info"]["pos"]
                 slidenew["pos"] = max(0, min(1, slidenew["pos"]))
 
