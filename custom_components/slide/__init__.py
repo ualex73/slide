@@ -101,12 +101,13 @@ async def async_setup(hass, config):
                     slidenew["state"] = (
                         STATE_OPEN if slidenew["pos"] <= 0.05 else STATE_OPENING
                     )
-            elif "code" in slide["device_info"]:
+            elif "code" in slide["device_info"] and "message" in slide["device_info"]:
                 _LOGGER.warning(
-                    "Slide %s (%s) is offline with " "code=%s",
+                    "Slide %s (%s) is offline with " "code=%s (%s)",
                     slide["id"],
                     slidenew["mac"],
                     slide["device_info"]["code"],
+                    slide["device_info"]["message"],
                 )
             else:
                 _LOGGER.error(

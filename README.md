@@ -4,7 +4,7 @@
 * IMPORTANT: The component has been renamed from 'goslide' to 'slide' on request of 'Innovation in Motion'
 * IMPORTANT: Configuration items timeout and retry are removed
 
-This custom component home-assistant (http://www.home-assistant.io) can control the Slide (https://nl.goslide.io). At this moment the component only support the Cloud option, because the local API hasn't been released yet (it planned to be included when released).
+This custom component home-assistant (http://www.home-assistant.io) can control the Slide (https://slide.store). At this moment the component only support the Cloud option, because the local API hasn't been released yet (it planned to be included when released).
 
 ## Slide
 
@@ -13,7 +13,7 @@ This custom component home-assistant (http://www.home-assistant.io) can control 
 
 ### Installation
 
-- Copy directory `goslide` `<config dir>/custom_components` directory.
+- Copy directory `slide` `<config dir>/custom_components` directory.
 - Configure with config below.
 - Restart Home-Assistant.
 
