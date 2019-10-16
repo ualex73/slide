@@ -1,4 +1,4 @@
-"""Support for Go Slide slides."""
+"""Support for Slide curtains."""
 
 import logging
 
@@ -11,28 +11,28 @@ from homeassistant.components.cover import (
     DEVICE_CLASS_CURTAIN,
     CoverDevice,
 )
-from .const import API, DOMAIN, SLIDES
+from .const import DATA_API, DATA_SLIDES, DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-    """Set up cover(s) for Go Slide platform."""
+    """Set up cover(s) for Slide platform."""
 
     if discovery_info is None:
         return
 
     entities = []
 
-    for slide in hass.data[DOMAIN][SLIDES].values():
+    for slide in hass.data[DOMAIN][DATA_SLIDES].values():
         _LOGGER.debug("Setting up Slide entity: %s", slide)
-        entities.append(SlideCover(hass.data[DOMAIN][API], slide))
+        entities.append(SlideCover(hass.data[DOMAIN][DATA_API], slide))
 
     async_add_entities(entities)
 
 
 class SlideCover(CoverDevice):
-    """Representation of a Go Slide cover."""
+    """Representation of a Slide cover."""
 
     def __init__(self, api, slide):
         """Initialize the cover."""
@@ -41,6 +41,7 @@ class SlideCover(CoverDevice):
         self._id = slide["id"]
         self._unique_id = slide["mac"]
         self._name = slide["name"]
+        self._invert = slide["invert"]
 
     @property
     def unique_id(self):
@@ -94,7 +95,10 @@ class SlideCover(CoverDevice):
         """Return the current position of cover shutter."""
         pos = self._slide["pos"]
         if pos is not None:
-            pos = int(pos * 100)
+            if self._invert:
+                pos = 100 - int(pos * 100)
+            else:
+                pos = int(pos * 100)
         return pos
 
     async def async_open_cover(self, **kwargs):
@@ -120,5 +124,8 @@ class SlideCover(CoverDevice):
                 self._slide["state"] = STATE_CLOSING
             else:
                 self._slide["state"] = STATE_OPENING
+
+        if self._invert:
+            position = 1 - position
 
         await self._api.slide_set_position(self._id, position)

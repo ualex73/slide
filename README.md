@@ -27,6 +27,7 @@ slide:
   username: slide@somedomain.com
   password: secret
   scan_interval: 30
+  invert_position: false
 ```
 
 Configuration variables:
@@ -34,6 +35,7 @@ Configuration variables:
 - **username** (*Required*): The e-mail used to register your account with api.goslide.io, with your iPhone/Android App
 - **password** (*Required*): The password of your account with api.goslide.io
 - **scan_interval** (*Optional*): Number of seconds between polls. (default = 30)
+- **invert_position** (*Optional*): If the position should be inverted e.g. 0% -> 100% and 100% -> 0%. This is required for Apple HomeKit. (default = false)
 
 ### Debugging
 

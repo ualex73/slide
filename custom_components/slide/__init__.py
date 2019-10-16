@@ -1,7 +1,6 @@
-"""Component for the Go Slide API."""
+"""Component for the Slide API."""
 
 import logging
-from datetime import timedelta
 
 import voluptuous as vol
 from goslideapi import GoSlideCloud, goslideapi
@@ -18,11 +17,19 @@ from homeassistant.const import (
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.helpers.event import async_track_time_interval, async_call_later
-from .const import DOMAIN, SLIDES, API, COMPONENT, DEFAULT_RETRY
+from .const import (
+    DATA_API,
+    DATA_RETRY,
+    DATA_SLIDES,
+    DATA_TIMER,
+    COMPONENT,
+    CONF_INVERT_POSITION,
+    DEFAULT_RETRY,
+    DEFAULT_SCAN_INTERVAL,
+    DOMAIN,
+)
 
 _LOGGER = logging.getLogger(__name__)
-
-DEFAULT_SCAN_INTERVAL = timedelta(seconds=30)
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -33,6 +40,7 @@ CONFIG_SCHEMA = vol.Schema(
                 vol.Optional(
                     CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
                 ): cv.time_period,
+                vol.Optional(CONF_INVERT_POSITION, default=False): cv.boolean,
             }
         )
     },
@@ -45,7 +53,7 @@ async def async_setup(hass, config):
 
     async def update_slides(now=None):
         """Update slide information."""
-        result = await hass.data[DOMAIN][API].slides_overview()
+        result = await hass.data[DOMAIN][DATA_API].slides_overview()
 
         if result is None:
             _LOGGER.error("Slide API does not work or returned an error")
@@ -65,7 +73,7 @@ async def async_setup(hass, config):
                 continue
 
             uid = slide["device_id"].replace("slide_", "")
-            slidenew = hass.data[DOMAIN][SLIDES].setdefault(uid, {})
+            slidenew = hass.data[DOMAIN][DATA_SLIDES].setdefault(uid, {})
             slidenew["mac"] = uid
             slidenew["id"] = slide["id"]
             slidenew["name"] = slide["device_name"]
@@ -73,6 +81,7 @@ async def async_setup(hass, config):
             oldpos = slidenew.get("pos")
             slidenew["pos"] = None
             slidenew["online"] = False
+            slidenew["invert"] = config[DOMAIN][CONF_INVERT_POSITION]
 
             if "device_info" not in slide:
                 _LOGGER.error(
@@ -124,23 +133,25 @@ async def async_setup(hass, config):
         await async_setup(hass, config)
 
     hass.data[DOMAIN] = {}
-    hass.data[DOMAIN][SLIDES] = {}
+    hass.data[DOMAIN][DATA_SLIDES] = {}
 
     username = config[DOMAIN][CONF_USERNAME]
     password = config[DOMAIN][CONF_PASSWORD]
     scaninterval = config[DOMAIN][CONF_SCAN_INTERVAL]
 
-    hass.data[DOMAIN][API] = GoSlideCloud(username, password)
+    hass.data[DOMAIN][DATA_API] = GoSlideCloud(username, password)
 
     try:
-        result = await hass.data[DOMAIN][API].login()
+        result = await hass.data[DOMAIN][DATA_API].login()
     except (goslideapi.ClientConnectionError, goslideapi.ClientTimeoutError) as err:
         _LOGGER.error(
             "Error connecting to Slide Cloud: %s, going to retry in %s seconds",
             err,
             DEFAULT_RETRY,
         )
-        async_call_later(hass, DEFAULT_RETRY, retry_setup)
+        hass.data[DOMAIN][DATA_RETRY] = async_call_later(
+            hass, DEFAULT_RETRY, retry_setup
+        )
         return True
 
     if not result:
@@ -153,6 +164,8 @@ async def async_setup(hass, config):
 
     hass.async_create_task(async_load_platform(hass, COMPONENT, DOMAIN, {}, config))
 
-    async_track_time_interval(hass, update_slides, scaninterval)
+    hass.data[DOMAIN][DATA_TIMER] = async_track_time_interval(
+        hass, update_slides, scaninterval
+    )
 
     return True
