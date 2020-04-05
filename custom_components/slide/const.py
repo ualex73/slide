@@ -1,12 +1,9 @@
 """Define constants for the Slide component."""
 
+API = "api"
 COMPONENT = "cover"
 CONF_INVERT_POSITION = "invert_position"
 DOMAIN = "slide"
-DATA_API = "api"
-DATA_RETRY = "retry"
-DATA_SLIDES = "slides"
-DATA_TIMER = "timer"
-DEFAULT_NAME = "Slide Curtain(s)"
+SLIDES = "slides"
+DEFAULT_OFFSET = 0.15
 DEFAULT_RETRY = 120
-DEFAULT_SCAN_INTERVAL = 30

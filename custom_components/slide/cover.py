@@ -1,17 +1,18 @@
-"""Support for Slide curtains."""
+"""Support for Slide slides."""
 
 import logging
 
-from homeassistant.const import ATTR_ID
 from homeassistant.components.cover import (
     ATTR_POSITION,
-    STATE_CLOSED,
-    STATE_OPENING,
-    STATE_CLOSING,
     DEVICE_CLASS_CURTAIN,
+    STATE_CLOSED,
+    STATE_CLOSING,
+    STATE_OPENING,
     CoverDevice,
 )
-from .const import DATA_API, DATA_SLIDES, DOMAIN
+from homeassistant.const import ATTR_ID
+
+from .const import API, DEFAULT_OFFSET, DOMAIN, SLIDES
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,9 +25,9 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
     entities = []
 
-    for slide in hass.data[DOMAIN][DATA_SLIDES].values():
+    for slide in hass.data[DOMAIN][SLIDES].values():
         _LOGGER.debug("Setting up Slide entity: %s", slide)
-        entities.append(SlideCover(hass.data[DOMAIN][DATA_API], slide))
+        entities.append(SlideCover(hass.data[DOMAIN][API], slide))
 
     async_add_entities(entities)
 
@@ -95,10 +96,11 @@ class SlideCover(CoverDevice):
         """Return the current position of cover shutter."""
         pos = self._slide["pos"]
         if pos is not None:
-            if self._invert:
-                pos = 100 - int(pos * 100)
-            else:
-                pos = int(pos * 100)
+            if (1 - pos) <= DEFAULT_OFFSET or pos <= DEFAULT_OFFSET:
+                pos = round(pos)
+            if not self._invert:
+                pos = 1 - pos
+            pos = int(pos * 100)
         return pos
 
     async def async_open_cover(self, **kwargs):
@@ -118,14 +120,13 @@ class SlideCover(CoverDevice):
     async def async_set_cover_position(self, **kwargs):
         """Move the cover to a specific position."""
         position = kwargs[ATTR_POSITION] / 100
+        if not self._invert:
+            position = 1 - position
 
         if self._slide["pos"] is not None:
             if position > self._slide["pos"]:
                 self._slide["state"] = STATE_CLOSING
             else:
                 self._slide["state"] = STATE_OPENING
-
-        if self._invert:
-            position = 1 - position
 
         await self._api.slide_set_position(self._id, position)

@@ -1,35 +1,37 @@
 """Component for the Slide API."""
 
+from datetime import timedelta
 import logging
 
-import voluptuous as vol
 from goslideapi import GoSlideCloud, goslideapi
+import voluptuous as vol
 
 from homeassistant.const import (
-    CONF_USERNAME,
     CONF_PASSWORD,
     CONF_SCAN_INTERVAL,
-    STATE_OPEN,
+    CONF_USERNAME,
     STATE_CLOSED,
-    STATE_OPENING,
     STATE_CLOSING,
+    STATE_OPEN,
+    STATE_OPENING,
 )
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.discovery import async_load_platform
-from homeassistant.helpers.event import async_track_time_interval, async_call_later
+from homeassistant.helpers.event import async_call_later, async_track_time_interval
+
 from .const import (
-    DATA_API,
-    DATA_RETRY,
-    DATA_SLIDES,
-    DATA_TIMER,
+    API,
     COMPONENT,
     CONF_INVERT_POSITION,
+    DEFAULT_OFFSET,
     DEFAULT_RETRY,
-    DEFAULT_SCAN_INTERVAL,
     DOMAIN,
+    SLIDES,
 )
 
 _LOGGER = logging.getLogger(__name__)
+
+DEFAULT_SCAN_INTERVAL = timedelta(seconds=30)
 
 CONFIG_SCHEMA = vol.Schema(
     {
@@ -53,7 +55,7 @@ async def async_setup(hass, config):
 
     async def update_slides(now=None):
         """Update slide information."""
-        result = await hass.data[DOMAIN][DATA_API].slides_overview()
+        result = await hass.data[DOMAIN][API].slides_overview()
 
         if result is None:
             _LOGGER.error("Slide API does not work or returned an error")
@@ -67,13 +69,12 @@ async def async_setup(hass, config):
         for slide in result:
             if "device_id" not in slide:
                 _LOGGER.error(
-                    "Found invalid Slide entry, device_id is " "missing. Entry=%s",
-                    slide,
+                    "Found invalid Slide entry, device_id is missing. Entry=%s", slide
                 )
                 continue
 
             uid = slide["device_id"].replace("slide_", "")
-            slidenew = hass.data[DOMAIN][DATA_SLIDES].setdefault(uid, {})
+            slidenew = hass.data[DOMAIN][SLIDES].setdefault(uid, {})
             slidenew["mac"] = uid
             slidenew["id"] = slide["id"]
             slidenew["name"] = slide["device_name"]
@@ -100,23 +101,28 @@ async def async_setup(hass, config):
 
                 if oldpos is None or oldpos == slidenew["pos"]:
                     slidenew["state"] = (
-                        STATE_CLOSED if slidenew["pos"] > 0.95 else STATE_OPEN
+                        STATE_CLOSED
+                        if slidenew["pos"] > (1 - DEFAULT_OFFSET)
+                        else STATE_OPEN
                     )
                 elif oldpos < slidenew["pos"]:
                     slidenew["state"] = (
-                        STATE_CLOSED if slidenew["pos"] >= 0.95 else STATE_CLOSING
+                        STATE_CLOSED
+                        if slidenew["pos"] >= (1 - DEFAULT_OFFSET)
+                        else STATE_CLOSING
                     )
                 else:
                     slidenew["state"] = (
-                        STATE_OPEN if slidenew["pos"] <= 0.05 else STATE_OPENING
+                        STATE_OPEN
+                        if slidenew["pos"] <= DEFAULT_OFFSET
+                        else STATE_OPENING
                     )
-            elif "code" in slide["device_info"] and "message" in slide["device_info"]:
+            elif "code" in slide["device_info"]:
                 _LOGGER.warning(
-                    "Slide %s (%s) is offline with " "code=%s (%s)",
+                    "Slide %s (%s) is offline with code=%s",
                     slide["id"],
                     slidenew["mac"],
                     slide["device_info"]["code"],
-                    slide["device_info"]["message"],
                 )
             else:
                 _LOGGER.error(
@@ -133,25 +139,23 @@ async def async_setup(hass, config):
         await async_setup(hass, config)
 
     hass.data[DOMAIN] = {}
-    hass.data[DOMAIN][DATA_SLIDES] = {}
+    hass.data[DOMAIN][SLIDES] = {}
 
     username = config[DOMAIN][CONF_USERNAME]
     password = config[DOMAIN][CONF_PASSWORD]
     scaninterval = config[DOMAIN][CONF_SCAN_INTERVAL]
 
-    hass.data[DOMAIN][DATA_API] = GoSlideCloud(username, password)
+    hass.data[DOMAIN][API] = GoSlideCloud(username, password)
 
     try:
-        result = await hass.data[DOMAIN][DATA_API].login()
+        result = await hass.data[DOMAIN][API].login()
     except (goslideapi.ClientConnectionError, goslideapi.ClientTimeoutError) as err:
         _LOGGER.error(
             "Error connecting to Slide Cloud: %s, going to retry in %s seconds",
             err,
             DEFAULT_RETRY,
         )
-        hass.data[DOMAIN][DATA_RETRY] = async_call_later(
-            hass, DEFAULT_RETRY, retry_setup
-        )
+        async_call_later(hass, DEFAULT_RETRY, retry_setup)
         return True
 
     if not result:
@@ -164,8 +168,6 @@ async def async_setup(hass, config):
 
     hass.async_create_task(async_load_platform(hass, COMPONENT, DOMAIN, {}, config))
 
-    hass.data[DOMAIN][DATA_TIMER] = async_track_time_interval(
-        hass, update_slides, scaninterval
-    )
+    async_track_time_interval(hass, update_slides, scaninterval)
 
     return True
