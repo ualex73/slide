@@ -1,42 +1,67 @@
 """Support for Slide slides."""
 
 import logging
+import voluptuous as vol
 
+from goslideapi import GoSlideLocal
 from homeassistant.components.cover import (
     ATTR_POSITION,
     DEVICE_CLASS_CURTAIN,
+    PLATFORM_SCHEMA,
     STATE_CLOSED,
     STATE_CLOSING,
     STATE_OPENING,
     CoverDevice,
 )
-from homeassistant.const import ATTR_ID
+from homeassistant.const import ATTR_ID, CONF_HOST, CONF_PASSWORD
+import homeassistant.helpers.config_validation as cv
 
-from .const import API, DEFAULT_OFFSET, DOMAIN, SLIDES
+from .const import API_CLOUD, API_LOCAL, DEFAULT_OFFSET, DOMAIN, SLIDES, TYPE_CLOUD, TYPE_LOCAL
 
 _LOGGER = logging.getLogger(__name__)
+
+"""
+PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
+    {vol.Required(CONF_HOST): cv.string, vol.Required(CONF_PASSWORD): cv.string},
+    extra=vol.ALLOW_EXTRA,
+)
+"""
+PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
+    {vol.Optional(CONF_HOST): cv.string, vol.Optional(CONF_PASSWORD): cv.string},
+    extra=vol.ALLOW_EXTRA,
+)
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
     """Set up cover(s) for Slide platform."""
 
     if discovery_info is None:
+        # Local
+        if API_LOCAL not in hass.data[DOMAIN]:
+            hass.data[DOMAIN][API_LOCAL] = GoSlideLocal()
+
+        hass.data[DOMAIN][API_LOCAL].slide_add(
+            config.get(CONF_HOST), config.get(CONF_PASSWORD)
+        )
+        # x = loop.run_until_complete(goslide.slide_add('192.168.30.13','KjdtZ7yL'))
         return
+    else:
+        # Cloud
+        entities = []
 
-    entities = []
+        for slide in hass.data[DOMAIN][SLIDES].values():
+            _LOGGER.debug("Setting up Slide entity: %s", slide)
+            entities.append(SlideCover(TYPE_CLOUD, hass.data[DOMAIN][API_CLOUD], slide))
 
-    for slide in hass.data[DOMAIN][SLIDES].values():
-        _LOGGER.debug("Setting up Slide entity: %s", slide)
-        entities.append(SlideCover(hass.data[DOMAIN][API], slide))
-
-    async_add_entities(entities)
+        async_add_entities(entities)
 
 
 class SlideCover(CoverDevice):
     """Representation of a Slide cover."""
 
-    def __init__(self, api, slide):
+    def __init__(self, type, api, slide):
         """Initialize the cover."""
+        self._type = type
         self._api = api
         self._slide = slide
         self._id = slide["id"]
@@ -130,3 +155,11 @@ class SlideCover(CoverDevice):
                 self._slide["state"] = STATE_OPENING
 
         await self._api.slide_set_position(self._id, position)
+
+    async def async_update(self):
+        if self._type == TYPE_CLOUD:
+            return
+
+        # x = loop.run_until_complete(goslide.slide_info('192.168.30.13'))
+        # do our magic here?
+        # but what about the first run??? where we need to get the MAC!!!

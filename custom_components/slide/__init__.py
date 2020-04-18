@@ -20,7 +20,7 @@ from homeassistant.helpers.discovery import async_load_platform
 from homeassistant.helpers.event import async_call_later, async_track_time_interval
 
 from .const import (
-    API,
+    API_CLOUD,
     COMPONENT,
     CONF_INVERT_POSITION,
     DEFAULT_OFFSET,
@@ -55,7 +55,7 @@ async def async_setup(hass, config):
 
     async def update_slides(now=None):
         """Update slide information."""
-        result = await hass.data[DOMAIN][API].slides_overview()
+        result = await hass.data[DOMAIN][API_CLOUD].slides_overview()
 
         if result is None:
             _LOGGER.error("Slide API does not work or returned an error")
@@ -145,10 +145,10 @@ async def async_setup(hass, config):
     password = config[DOMAIN][CONF_PASSWORD]
     scaninterval = config[DOMAIN][CONF_SCAN_INTERVAL]
 
-    hass.data[DOMAIN][API] = GoSlideCloud(username, password)
+    hass.data[DOMAIN][API_CLOUD] = GoSlideCloud(username, password)
 
     try:
-        result = await hass.data[DOMAIN][API].login()
+        result = await hass.data[DOMAIN][API_CLOUD].login()
     except (goslideapi.ClientConnectionError, goslideapi.ClientTimeoutError) as err:
         _LOGGER.error(
             "Error connecting to Slide Cloud: %s, going to retry in %s second(s)",
