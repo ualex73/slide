@@ -1,10 +1,6 @@
 # Home-Assistant Custom Component for Slide
 
-* IMPORTANT: The cover entity has integrated into Home Assistant entity registry, so your Slide name could have changed
-* IMPORTANT: The component has been renamed from 'goslide' to 'slide' on request of 'Innovation in Motion'
-* IMPORTANT: Configuration items timeout and retry are removed
-
-This custom component home-assistant (http://www.home-assistant.io) can control the Slide (https://slide.store). At this moment the component only support the Cloud option, because the local API hasn't been released yet (it planned to be included when released).
+This custom component home-assistant (http://www.home-assistant.io) can control the Slide (https://slide.store).
 
 ## Slide
 
@@ -18,7 +14,7 @@ This custom component home-assistant (http://www.home-assistant.io) can control 
 - Restart Home-Assistant.
 
 ### Usage
-To use this component in your installation, add the following to your `configuration.yaml` file:
+To use this component in your installation for the Cloud API, add the following to your `configuration.yaml` file:
 
 ```yaml
 # Example configuration.yaml entry
@@ -37,6 +33,21 @@ Configuration variables:
 - **scan_interval** (*Optional*): Number of seconds between polls (default = 30)
 - **invert_position** (*Optional*): If the position should be inverted e.g. 0% -> 100% and 100% -> 0% (default = false)
 
+```yaml
+# Example yaml entry
+
+cover:
+  - platform: slide
+    host: 192.168.1.1
+    password: 12345678
+```
+
+Configuration variables:
+
+- **host** (*Required*): The IP address or hostname of your local Slide
+- **password** (*Required*): The device code of your Slide (inside of the Slide or in the box, length is 8 characters)
+- **invert_position** (*Optional*): If the position should be inverted e.g. 0% -> 100% and 100% -> 0% (default = false)
+
 ### Debugging
 
 It is possible to debug the Slide component and API library, this can be done by adding the following lines to the `configuration.yaml` file:
@@ -51,6 +62,5 @@ logger:
 
 ### TO DO
 
-- Add local API support, when released
 - Add calibration as a service
 
