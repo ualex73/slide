@@ -33,6 +33,8 @@ Configuration variables:
 - **scan_interval** (*Optional*): Number of seconds between polls (default = 30)
 - **invert_position** (*Optional*): If the position should be inverted e.g. 0% -> 100% and 100% -> 0% (default = false)
 
+To use this component in your installation With the Local API, add the following to your `configuration.yaml` file for each Slide:
+
 ```yaml
 # Example yaml entry
 
