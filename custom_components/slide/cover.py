@@ -12,7 +12,7 @@ from homeassistant.components.cover import (
     STATE_CLOSING,
     STATE_OPEN,
     STATE_OPENING,
-    CoverDevice,
+    CoverEntity,
 )
 from homeassistant.const import ATTR_ID, CONF_HOST, CONF_PASSWORD
 import homeassistant.helpers.config_validation as cv
@@ -84,7 +84,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
         async_add_entities(entities)
 
 
-class SlideCoverCloud(CoverDevice):
+class SlideCoverCloud(CoverEntity):
     """Representation of a Slide Cloud API cover."""
 
     def __init__(self, api, slide):
@@ -184,7 +184,7 @@ class SlideCoverCloud(CoverDevice):
         await self._api.slide_set_position(self._id, position)
 
 
-class SlideCoverLocal(CoverDevice):
+class SlideCoverLocal(CoverEntity):
     """Representation of a Slide Local API cover."""
 
     def __init__(self, api, slide, host, invert):
