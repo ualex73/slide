@@ -7,6 +7,10 @@ This custom component home-assistant (http://www.home-assistant.io) can control 
 ### Requirements
 - Home Assistant 0.94+
 
+### Custom Component vs Integration
+
+The `slide` integration is included into the Home Assistant and it is based on this custom component. The custom component will contain newer features then the standard integrated one, until it is hopefully merged into Home Assistant. At this moment the local API will only be available in the custom component. Also Home Assistant dictates that integrations should move to the GUI integration instead of the YAML file, which is difficult/impossible with the local API configuration.
+
 ### Installation
 
 - Copy directory `slide` `<config dir>/custom_components` directory.
