@@ -331,7 +331,7 @@ class SlideCoverLocal(CoverEntity):
                     else STATE_CLOSING
                 )
             else:
-                self._slidenew["state"] = (
+                self._slide["state"] = (
                     STATE_OPEN
                     if self._slide["pos"] <= DEFAULT_OFFSET
                     else STATE_OPENING
