@@ -28,6 +28,8 @@ LED flashes 2x slow: local API disabled, cloud API enabled
 
 NOTE: If a new Slide is installed, it could be the firmware is too old. Configure it via the cloud API and wait a few days (or contact Slide support to push a newer firmware).
 
+![alt text](https://github.com/ualex73/slide/blob/master/screenshots/slide-bottom.png?raw=true "Screenshot Slide Bottom")
+
 ### Usage
 To use this component in your installation for the Cloud API, add the following to your `configuration.yaml` file:
 
