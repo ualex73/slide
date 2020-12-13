@@ -17,6 +17,17 @@ The `slide` integration is included into the Home Assistant and it is based on t
 - Configure with config below.
 - Restart Home-Assistant.
 
+### Switch between Cloud and Local API
+
+By default the Slide connects to the cloud API, but it is possible to use the local API too (only 1 of them can be active). To switch between the cloud and local API, do the following step:
+
+- Press the reset button 2x
+
+LED flashes 5x fast: cloud API disabled, local API enabled
+LED flashes 2x slow: local API disabled, cloud API enabled
+
+NOTE: If a new Slide is installed, it could be the firmware is too old. Configure it via the cloud API and wait a few days (or contact Slide support to push a newer firmware).
+
 ### Usage
 To use this component in your installation for the Cloud API, add the following to your `configuration.yaml` file:
 

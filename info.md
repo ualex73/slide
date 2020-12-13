@@ -17,6 +17,17 @@ The `slide` integration is included into the Home Assistant and it is based on t
 - Configure with config below.
 - Restart Home-Assistant.
 
+### Switch between Cloud and Local API
+
+By default the Slide connects to the cloud API, but it is possible to use the local API too (only 1 of them can be active). To switch between the cloud and local API, do the following step:
+
+- Press the reset button 2x
+
+LED flashes 5x fast: cloud API disabled, local API enabled
+LED flashes 2x slow: local API disabled, cloud API enabled
+
+NOTE: If a new Slide is installed, it could be the firmware is too old. Configure it via the cloud API and wait a few days (or contact Slide support to push a newer firmware).
+
 ### Usage
 To use this component in your installation for the Cloud API, add the following to your `configuration.yaml` file:
 
@@ -27,7 +38,8 @@ slide:
   username: slide@somedomain.com
   password: secret
   scan_interval: 30
-  invert_position: false
+  invert_position: False
+  verify_ssl: True
 ```
 
 Configuration variables:
@@ -35,7 +47,8 @@ Configuration variables:
 - **username** (*Required*): The e-mail used to register your account with api.goslide.io, with your iPhone/Android App
 - **password** (*Required*): The password of your account with api.goslide.io
 - **scan_interval** (*Optional*): Number of seconds between polls (default = 30)
-- **invert_position** (*Optional*): If the position should be inverted e.g. 0% -> 100% and 100% -> 0% (default = false)
+- **invert_position** (*Optional*): If the position should be inverted e.g. 0% -> 100% and 100% -> 0% (default = False)
+- **verify_ssl** (*Optional*): If the SSL certificate should be checked (default = True)
 
 To use this component in your installation With the Local API, add the following to your `configuration.yaml` file for each Slide:
 
@@ -52,7 +65,7 @@ Configuration variables:
 
 - **host** (*Required*): The IP address or hostname of your local Slide
 - **password** (*Required*): The device code of your Slide (inside of the Slide or in the box, length is 8 characters)
-- **invert_position** (*Optional*): If the position should be inverted e.g. 0% -> 100% and 100% -> 0% (default = false)
+- **invert_position** (*Optional*): If the position should be inverted e.g. 0% -> 100% and 100% -> 0% (default = False)
 
 ### Debugging
 
