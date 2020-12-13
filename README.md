@@ -23,7 +23,7 @@ By default the Slide connects to the cloud API, but it is possible to use the lo
 
 - Press the reset button 2x
 
-LED flashes 5x fast: cloud API disabled, local API enabled
+LED flashes 5x fast: cloud API disabled, local API enabled  
 LED flashes 2x slow: local API disabled, cloud API enabled
 
 NOTE: If a new Slide is installed, it could be the firmware is too old. Configure it via the cloud API and wait a few days (or contact Slide support to push a newer firmware).
