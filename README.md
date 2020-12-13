@@ -27,7 +27,8 @@ slide:
   username: slide@somedomain.com
   password: secret
   scan_interval: 30
-  invert_position: false
+  invert_position: False
+  verify_ssl: True
 ```
 
 Configuration variables:
@@ -35,7 +36,8 @@ Configuration variables:
 - **username** (*Required*): The e-mail used to register your account with api.goslide.io, with your iPhone/Android App
 - **password** (*Required*): The password of your account with api.goslide.io
 - **scan_interval** (*Optional*): Number of seconds between polls (default = 30)
-- **invert_position** (*Optional*): If the position should be inverted e.g. 0% -> 100% and 100% -> 0% (default = false)
+- **invert_position** (*Optional*): If the position should be inverted e.g. 0% -> 100% and 100% -> 0% (default = False)
+- **verify_ssl** (*Optional*): If the SSL certificate should be checked (default = True)
 
 To use this component in your installation With the Local API, add the following to your `configuration.yaml` file for each Slide:
 
@@ -52,7 +54,7 @@ Configuration variables:
 
 - **host** (*Required*): The IP address or hostname of your local Slide
 - **password** (*Required*): The device code of your Slide (inside of the Slide or in the box, length is 8 characters)
-- **invert_position** (*Optional*): If the position should be inverted e.g. 0% -> 100% and 100% -> 0% (default = false)
+- **invert_position** (*Optional*): If the position should be inverted e.g. 0% -> 100% and 100% -> 0% (default = False)
 
 ### Debugging
 

@@ -23,6 +23,7 @@ from .const import (
     API_CLOUD,
     COMPONENT,
     CONF_INVERT_POSITION,
+    CONF_VERIFY_SSL,
     DEFAULT_OFFSET,
     DEFAULT_RETRY,
     DOMAIN,
@@ -43,6 +44,7 @@ CONFIG_SCHEMA = vol.Schema(
                     CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
                 ): cv.time_period,
                 vol.Optional(CONF_INVERT_POSITION, default=False): cv.boolean,
+                vol.Optional(CONF_VERIFY_SSL, default=True): cv.boolean,
             }
         )
     },
@@ -144,8 +146,9 @@ async def async_setup(hass, config):
     username = config[DOMAIN][CONF_USERNAME]
     password = config[DOMAIN][CONF_PASSWORD]
     scaninterval = config[DOMAIN][CONF_SCAN_INTERVAL]
+    verify_ssl = config[DOMAIN][CONF_VERIFY_SSL]
 
-    hass.data[DOMAIN][API_CLOUD] = GoSlideCloud(username, password)
+    hass.data[DOMAIN][API_CLOUD] = GoSlideCloud(username, password, verify_ssl=verify_ssl)
 
     try:
         result = await hass.data[DOMAIN][API_CLOUD].login()

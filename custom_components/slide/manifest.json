@@ -2,6 +2,6 @@
   "domain": "slide",
   "name": "Slide",
   "documentation": "https://www.home-assistant.io/integrations/slide",
-  "requirements": ["goslide-api==0.6.2"],
+  "requirements": ["goslide-api==0.6.4"],
   "codeowners": ["@ualex73"]
 }
