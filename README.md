@@ -69,6 +69,10 @@ Configuration variables:
 - **password** (*Required*): The device code of your Slide (inside of the Slide or in the box, length is 8 characters)
 - **invert_position** (*Optional*): If the position should be inverted e.g. 0% -> 100% and 100% -> 0% (default = False)
 
+### Services
+
+- slide.calibrate - It is possible to call this service to calibrate your Slide
+
 ### Debugging
 
 It is possible to debug the Slide component and API library, this can be done by adding the following lines to the `configuration.yaml` file:
@@ -80,7 +84,3 @@ logger:
     custom_components.slide: debug
     homeassistant.components.slide: debug
 ```
-
-### TO DO
-
-- Add calibration as a service

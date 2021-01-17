@@ -15,7 +15,7 @@ from homeassistant.components.cover import (
     CoverEntity,
 )
 from homeassistant.const import ATTR_ID, CONF_HOST, CONF_PASSWORD
-import homeassistant.helpers.config_validation as cv
+from homeassistant.helpers import config_validation as cv, entity_platform
 
 from .const import (
     API_CLOUD,
@@ -24,6 +24,7 @@ from .const import (
     CONF_INVERT_POSITION,
     DEFAULT_OFFSET,
     DOMAIN,
+    SERVICE_CALIBRATE,
     SLIDES,
     SLIDES_LOCAL,
 )
@@ -82,6 +83,9 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
             entities.append(SlideCoverCloud(hass.data[DOMAIN][API_CLOUD], slide))
 
         async_add_entities(entities)
+
+    platform = entity_platform.current_platform.get()
+    platform.async_register_entity_service(SERVICE_CALIBRATE, {}, "async_calibrate")
 
 
 class SlideCoverCloud(CoverEntity):
@@ -182,6 +186,10 @@ class SlideCoverCloud(CoverEntity):
                 self._slide["state"] = STATE_OPENING
 
         await self._api.slide_set_position(self._id, position)
+
+    async def async_calibrate(self):
+        """Calibrate the Slide."""
+        await self._api.slide_calibrate(self._id)
 
 
 class SlideCoverLocal(CoverEntity):
@@ -351,3 +359,7 @@ class SlideCoverLocal(CoverEntity):
         #   "pos": 0.0,
         #   "touch_go": true
         # }
+
+    async def async_calibrate(self):
+        """Calibrate the Slide."""
+        await self._api.slide_calibrate(self._id)

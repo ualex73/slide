@@ -11,3 +11,4 @@ SLIDES = "slides"
 SLIDES_LOCAL = "slides_local"
 DEFAULT_OFFSET = 0.15
 DEFAULT_RETRY = 120
+SERVICE_CALIBRATE = "calibrate"
