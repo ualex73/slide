@@ -140,6 +140,10 @@ async def async_setup(hass, config):
         """Retry setup if a connection/timeout happens on Slide API."""
         await async_setup(hass, config)
 
+    if not DOMAIN in config:
+        _LOGGER.info("Slide Cloud API not configured")
+        return True
+
     hass.data[DOMAIN] = {}
     hass.data[DOMAIN][SLIDES] = {}
 
@@ -148,7 +152,9 @@ async def async_setup(hass, config):
     scaninterval = config[DOMAIN][CONF_SCAN_INTERVAL]
     verify_ssl = config[DOMAIN][CONF_VERIFY_SSL]
 
-    hass.data[DOMAIN][API_CLOUD] = GoSlideCloud(username, password, verify_ssl=verify_ssl)
+    hass.data[DOMAIN][API_CLOUD] = GoSlideCloud(
+        username, password, verify_ssl=verify_ssl
+    )
 
     try:
         result = await hass.data[DOMAIN][API_CLOUD].login()
