@@ -21,6 +21,7 @@ from .const import (
     API_CLOUD,
     API_LOCAL,
     ATTR_TOUCHGO,
+    CONF_API_VERSION,
     CONF_INVERT_POSITION,
     DEFAULT_OFFSET,
     DOMAIN,
@@ -36,6 +37,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_HOST): cv.string,
         vol.Optional(CONF_PASSWORD): cv.string,
         vol.Optional(CONF_INVERT_POSITION, default=False): cv.boolean,
+        vol.Optional(CONF_API_VERSION, default=1): cv.byte,
     },
     extra=vol.ALLOW_EXTRA,
 )
@@ -53,7 +55,9 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
             hass.data[DOMAIN][API_LOCAL] = GoSlideLocal()
 
         await hass.data[DOMAIN][API_LOCAL].slide_add(
-            config.get(CONF_HOST), config.get(CONF_PASSWORD)
+            config.get(CONF_HOST),
+            config.get(CONF_PASSWORD),
+            config.get(CONF_API_VERSION),
         )
 
         slide = await hass.data[DOMAIN][API_LOCAL].slide_info(config.get(CONF_HOST))
