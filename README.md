@@ -61,7 +61,7 @@ cover:
   - platform: slide
     host: 192.168.1.1
     password: 12345678
-    api_version: 1
+    api_version: 2
 ```
 
 Configuration variables:
@@ -69,7 +69,7 @@ Configuration variables:
 - **host** (*Required*): The IP address or hostname of your local Slide
 - **password** (*Required*): The device code of your Slide (inside of the Slide or in the box, length is 8 characters)
 - **invert_position** (*Optional*): If the position should be inverted e.g. 0% -> 100% and 100% -> 0% (default = False)
-- **api_versionn** (*Optional*): 1 or 2. 1 is pre Aug-2023 firmware. 2 is for Aug-2023 or later (default = 1)
+- **api_version** (*Optional*): 1 or 2. 1 is pre Aug-2023 firmware. 2 is for Aug-2023 or later (default = 2)
 
 ### Services
 
