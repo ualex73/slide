@@ -2,5 +2,8 @@ calibrate:
   description: "Start calibration of the Slide."
   fields:
     entity_id:
-      description: Name of the Slide entity to calibrate
-      example: "cover.slide_front_window"
+      required: true
+      selector:
+        entity:
+          integration: slide
+          domain: cover

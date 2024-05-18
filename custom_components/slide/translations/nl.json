@@ -1,0 +1,14 @@
+{
+    "services": {
+        "calibrate": {
+            "description": "Kalibreer een Slide.",
+            "fields": {
+                "entity_id": {
+                    "description": "Entity id van de slide cover die je wilt kalibreren.",
+                    "name": "Entity"
+                }
+            },
+            "name": "Kalibreer"
+        }
+    }
+}
