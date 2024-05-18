@@ -1,5 +1,4 @@
 {
   "name": "Slide",
-  "render_readme": true,
-  "domains": ["cover"]
+  "render_readme": true
 }
