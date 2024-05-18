@@ -37,7 +37,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_HOST): cv.string,
         vol.Optional(CONF_PASSWORD): cv.string,
         vol.Optional(CONF_INVERT_POSITION, default=False): cv.boolean,
-        vol.Optional(CONF_API_VERSION, default=1): cv.byte,
+        vol.Optional(CONF_API_VERSION, default=2): cv.byte,
     },
     extra=vol.ALLOW_EXTRA,
 )
