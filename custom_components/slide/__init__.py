@@ -21,7 +21,7 @@ from homeassistant.helpers.event import async_call_later, async_track_time_inter
 
 from .const import (
     API_CLOUD,
-    COMPONENT,
+    COMPONENT_PLATFORM,
     CONF_INVERT_POSITION,
     CONF_VERIFY_SSL,
     DEFAULT_OFFSET,
@@ -175,7 +175,9 @@ async def async_setup(hass, config):
 
     await update_slides()
 
-    hass.async_create_task(async_load_platform(hass, COMPONENT, DOMAIN, {}, config))
+    hass.async_create_task(
+        async_load_platform(hass, COMPONENT_PLATFORM, DOMAIN, {}, config)
+    )
 
     async_track_time_interval(hass, update_slides, scaninterval)
 

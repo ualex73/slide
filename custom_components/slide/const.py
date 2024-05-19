@@ -1,9 +1,11 @@
 """Define constants for the Slide component."""
 
+from homeassistant.const import Platform
+
 API_CLOUD = "api_cloud"
 API_LOCAL = "api_local"
 ATTR_TOUCHGO = "touchgo"
-COMPONENT = "cover"
+COMPONENT_PLATFORM = Platform.COVER
 CONF_API_VERSION = "api_version"
 CONF_INVERT_POSITION = "invert_position"
 CONF_VERIFY_SSL = "verify_ssl"
