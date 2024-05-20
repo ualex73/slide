@@ -67,7 +67,7 @@ cover:
 Configuration variables:
 
 - **host** (*Required*): The IP address or hostname of your local Slide
-- **password** (*Required*): The device code of your Slide (inside of the Slide or in the box, length is 8 characters)
+- **password** (*Required*): The device code of your Slide (inside of the Slide or in the box, length is 8 characters). NOTE: With *api_version: 2* you can fill in anything here, it is not used by the local API
 - **invert_position** (*Optional*): If the position should be inverted e.g. 0% -> 100% and 100% -> 0% (default = False)
 - **api_version** (*Optional*): 1 or 2. 1 is pre Aug-2023 firmware. 2 is for Aug-2023 or later (default = 2)
 
