@@ -1,3 +1,4 @@
+reload:
 calibrate:
   description: "Start calibration of the Slide."
   fields:

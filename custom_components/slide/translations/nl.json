@@ -1,5 +1,9 @@
 {
     "services": {
+        "reload": {
+            "description": "Herlaad alle Slide entiteiten.",
+            "name": "Herladen"
+        },
         "calibrate": {
             "description": "Kalibreer een Slide.",
             "fields": {

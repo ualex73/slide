@@ -1,5 +1,9 @@
 {
     "services": {
+        "reload": {
+            "name": "[%key:common::action::reload%]",
+            "description": "Reloads all Slide entities."
+        },
         "calibrate": {
             "name": "[%key:common::action::calibrate%]",
             "description": "Calibrate a Slide.",

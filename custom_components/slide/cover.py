@@ -14,20 +14,23 @@ from homeassistant.components.cover import (
     CoverEntity,
     CoverDeviceClass,
 )
+
+from homeassistant.core import HomeAssistant
 from homeassistant.const import ATTR_ID, CONF_HOST, CONF_PASSWORD
 from homeassistant.helpers import config_validation as cv, entity_platform
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from typing import Any
 
 from .const import (
-    API_CLOUD,
-    API_LOCAL,
+    API,
     ATTR_TOUCHGO,
+    COMPONENT_PLATFORM,
     CONF_API_VERSION,
     CONF_INVERT_POSITION,
     DEFAULT_OFFSET,
     DOMAIN,
     SERVICE_CALIBRATE,
-    SLIDES,
-    SLIDES_LOCAL,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -43,162 +46,99 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 )
 
 
-async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
+async def async_setup_platform(
+    hass: HomeAssistant,
+    config: ConfigType,
+    async_add_entities: AddEntitiesCallback,
+    discovery_info: DiscoveryInfoType | None = None,
+) -> None:
     """Set up cover(s) for Slide platform."""
 
-    if discovery_info is None:
-        # Local
-        if DOMAIN not in hass.data:
-            hass.data[DOMAIN] = {}
+    _LOGGER.debug("Initializing Slide cover(s)")
 
-        if API_LOCAL not in hass.data[DOMAIN]:
-            hass.data[DOMAIN][API_LOCAL] = GoSlideLocal()
-
-        await hass.data[DOMAIN][API_LOCAL].slide_add(
-            config.get(CONF_HOST),
-            config.get(CONF_PASSWORD),
-        )
-
-        slide = await hass.data[DOMAIN][API_LOCAL].slide_info(config.get(CONF_HOST))
-
-        if slide is not None:
-            _LOGGER.debug(
-                "Setting up Slide Local entity '%s': %s", config.get(CONF_HOST), slide
-            )
-            async_add_entities(
-                [
-                    SlideCoverLocal(
-                        hass.data[DOMAIN][API_LOCAL],
-                        slide,
-                        config.get(CONF_HOST),
-                        config.get(CONF_INVERT_POSITION),
-                    )
-                ]
-            )
-        else:
-            _LOGGER.error("Unable to setup Slide Local '%s'", config.get(CONF_HOST))
-    else:
-        # Cloud
-        entities = []
-
-        for slide in hass.data[DOMAIN][SLIDES].values():
-            _LOGGER.debug("Setting up Slide Cloud entity: %s", slide)
-            entities.append(SlideCoverCloud(hass.data[DOMAIN][API_CLOUD], slide))
-
-        async_add_entities(entities)
-
+    # Register calibrate service
     platform = entity_platform.current_platform.get()
     platform.async_register_entity_service(SERVICE_CALIBRATE, {}, "async_calibrate")
 
+    covers = []
 
-class SlideCoverCloud(CoverEntity):
-    """Representation of a Slide Cloud API cover."""
+    if API not in hass.data[DOMAIN]:
+        hass.data[DOMAIN][API] = GoSlideLocal()
 
-    def __init__(self, api, slide):
-        """Initialize the cover."""
-        self._api = api
-        self._slide = slide
-        self._id = slide["id"]
-        self._unique_id = slide["mac"]
-        self._name = slide["name"]
-        self._invert = slide["invert"]
+    # Only setup platform once, while component can be multiple times
+    if discovery_info and not hass.data[DOMAIN][COMPONENT_PLATFORM]:
+        for cover in discovery_info:
+            _LOGGER.debug(
+                "Trying to setup Slide '%s', config=%s",
+                cover.get(CONF_HOST),
+                str(cover),
+            )
 
-    @property
-    def unique_id(self):
-        """Return the device unique id."""
-        return self._unique_id
+            await hass.data[DOMAIN][API].slide_add(
+                cover.get(CONF_HOST),
+                cover.get(CONF_PASSWORD),
+            )
 
-    @property
-    def name(self):
-        """Return the device name."""
-        return self._name
+            slide = await hass.data[DOMAIN][API].slide_info(cover.get(CONF_HOST))
 
-    @property
-    def device_state_attributes(self):
-        """Return device specific state attributes."""
-        return {ATTR_ID: self._id}
+            if slide is not None:
+                _LOGGER.debug("Setup Slide '%s' successful", cover.get(CONF_HOST))
 
-    @property
-    def is_opening(self):
-        """Return if the cover is opening or not."""
-        return self._slide["state"] == STATE_OPENING
-
-    @property
-    def is_closing(self):
-        """Return if the cover is closing or not."""
-        return self._slide["state"] == STATE_CLOSING
-
-    @property
-    def is_closed(self):
-        """Return None if status is unknown, True if closed, else False."""
-        if self._slide["state"] is None:
-            return None
-        return self._slide["state"] == STATE_CLOSED
-
-    @property
-    def available(self):
-        """Return False if state is not available."""
-        return self._slide["online"]
-
-    @property
-    def assumed_state(self):
-        """Let HA know the integration is assumed state."""
-        return True
-
-    @property
-    def device_class(self):
-        """Return the device class of the cover."""
-        return CoverDeviceClass.CURTAIN
-
-    @property
-    def current_cover_position(self):
-        """Return the current position of cover shutter."""
-        pos = self._slide["pos"]
-        if pos is not None:
-            if (1 - pos) <= DEFAULT_OFFSET or pos <= DEFAULT_OFFSET:
-                pos = round(pos)
-            if not self._invert:
-                pos = 1 - pos
-            pos = int(pos * 100)
-        return pos
-
-    async def async_open_cover(self, **kwargs):
-        """Open the cover."""
-        self._slide["state"] = STATE_OPENING
-        await self._api.slide_open(self._id)
-
-    async def async_close_cover(self, **kwargs):
-        """Close the cover."""
-        self._slide["state"] = STATE_CLOSING
-        await self._api.slide_close(self._id)
-
-    async def async_stop_cover(self, **kwargs):
-        """Stop the cover."""
-        await self._api.slide_stop(self._id)
-
-    async def async_set_cover_position(self, **kwargs):
-        """Move the cover to a specific position."""
-        position = kwargs[ATTR_POSITION] / 100
-        if not self._invert:
-            position = 1 - position
-
-        if self._slide["pos"] is not None:
-            if position > self._slide["pos"]:
-                self._slide["state"] = STATE_CLOSING
+                covers.append(
+                    SlideCover(
+                        hass.data[DOMAIN][API],
+                        slide,
+                        cover.get(CONF_HOST),
+                        cover.get(CONF_INVERT_POSITION),
+                    )
+                )
             else:
-                self._slide["state"] = STATE_OPENING
+                _LOGGER.error("Unable to setup Slide '%s'", cover.get(CONF_HOST))
 
-        await self._api.slide_set_position(self._id, position)
+        async_add_entities(covers)
 
-    async def async_calibrate(self):
-        """Calibrate the Slide."""
-        await self._api.slide_calibrate(self._id)
+        hass.data[DOMAIN][COMPONENT_PLATFORM] = True
+        return
+
+    if not config:
+        _LOGGER.error("Something wrong in 'cover:' section?")
+        return
+
+    # This is component, can be supplied via "cover:". Will be removed soon
+    await hass.data[DOMAIN][API].slide_add(
+        config.get(CONF_HOST),
+        config.get(CONF_PASSWORD),
+    )
+    slide = await hass.data[DOMAIN][API].slide_info(config.get(CONF_HOST))
+
+    _LOGGER.debug(
+        "Trying to setup Slide '%s', config=%s", config.get(CONF_HOST), str(config)
+    )
+
+    if slide is not None:
+        _LOGGER.debug(
+            "Setting up Slide Local entity '%s': %s", config.get(CONF_HOST), slide
+        )
+        async_add_entities(
+            [
+                SlideCover(
+                    hass.data[DOMAIN][API],
+                    slide,
+                    config.get(CONF_HOST),
+                    config.get(CONF_INVERT_POSITION),
+                )
+            ]
+        )
+    else:
+        _LOGGER.error("Unable to setup Slide '%s'", config.get(CONF_HOST))
 
 
-class SlideCoverLocal(CoverEntity):
+class SlideCover(CoverEntity):
     """Representation of a Slide Local API cover."""
 
-    def __init__(self, api, slide, host, invert):
+    def __init__(
+        self, api: GoSlideLocal, slide: dict[Any], host: str, invert: bool
+    ) -> None:
         """Initialize the cover."""
         self._api = api
         self._slide = {}
@@ -215,7 +155,7 @@ class SlideCoverLocal(CoverEntity):
         self._name = host
         if self._unique_id is None:
             _LOGGER.error(
-                "Unable to setup Slide Local '%s', the MAC is missing in the slide response",
+                "Unable to setup Slide Local '%s', the MAC is missing in the Slide response",
                 self._id,
             )
             return False
