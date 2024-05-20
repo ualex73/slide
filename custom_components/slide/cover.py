@@ -6,7 +6,6 @@ import voluptuous as vol
 from goslideapi import GoSlideLocal
 from homeassistant.components.cover import (
     ATTR_POSITION,
-    PLATFORM_SCHEMA,
     STATE_CLOSED,
     STATE_CLOSING,
     STATE_OPEN,
@@ -16,7 +15,7 @@ from homeassistant.components.cover import (
 )
 
 from homeassistant.core import HomeAssistant
-from homeassistant.const import ATTR_ID, CONF_HOST, CONF_PASSWORD
+from homeassistant.const import ATTR_ENTITY_ID, ATTR_ID, CONF_HOST, CONF_PASSWORD
 from homeassistant.helpers import config_validation as cv, entity_platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
@@ -25,8 +24,6 @@ from typing import Any
 from .const import (
     API,
     ATTR_TOUCHGO,
-    COMPONENT_PLATFORM,
-    CONF_API_VERSION,
     CONF_INVERT_POSITION,
     DEFAULT_OFFSET,
     DOMAIN,
@@ -35,14 +32,10 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
+XXX_SCHEMA = vol.Schema(
     {
         vol.Optional(CONF_HOST): cv.string,
-        vol.Optional(CONF_PASSWORD): cv.string,
-        vol.Optional(CONF_INVERT_POSITION, default=False): cv.boolean,
-        vol.Optional(CONF_API_VERSION, default=2): cv.byte,
-    },
-    extra=vol.ALLOW_EXTRA,
+    }
 )
 
 
@@ -56,9 +49,14 @@ async def async_setup_platform(
 
     _LOGGER.debug("Initializing Slide cover(s)")
 
-    # Register calibrate service
     platform = entity_platform.current_platform.get()
-    platform.async_register_entity_service(SERVICE_CALIBRATE, {}, "async_calibrate")
+    platform.async_register_entity_service(
+        SERVICE_CALIBRATE,
+        {
+            vol.Required(ATTR_ENTITY_ID): cv.entity_ids,
+        },
+        "async_calibrate",
+    )
 
     covers = []
 
@@ -66,7 +64,7 @@ async def async_setup_platform(
         hass.data[DOMAIN][API] = GoSlideLocal()
 
     # Only setup platform once, while component can be multiple times
-    if discovery_info and not hass.data[DOMAIN][COMPONENT_PLATFORM]:
+    if discovery_info:
         for cover in discovery_info:
             _LOGGER.debug(
                 "Trying to setup Slide '%s', config=%s",
@@ -96,41 +94,11 @@ async def async_setup_platform(
                 _LOGGER.error("Unable to setup Slide '%s'", cover.get(CONF_HOST))
 
         async_add_entities(covers)
-
-        hass.data[DOMAIN][COMPONENT_PLATFORM] = True
         return
 
     if not config:
         _LOGGER.error("Something wrong in 'cover:' section?")
         return
-
-    # This is component, can be supplied via "cover:". Will be removed soon
-    await hass.data[DOMAIN][API].slide_add(
-        config.get(CONF_HOST),
-        config.get(CONF_PASSWORD),
-    )
-    slide = await hass.data[DOMAIN][API].slide_info(config.get(CONF_HOST))
-
-    _LOGGER.debug(
-        "Trying to setup Slide '%s', config=%s", config.get(CONF_HOST), str(config)
-    )
-
-    if slide is not None:
-        _LOGGER.debug(
-            "Setting up Slide Local entity '%s': %s", config.get(CONF_HOST), slide
-        )
-        async_add_entities(
-            [
-                SlideCover(
-                    hass.data[DOMAIN][API],
-                    slide,
-                    config.get(CONF_HOST),
-                    config.get(CONF_INVERT_POSITION),
-                )
-            ]
-        )
-    else:
-        _LOGGER.error("Unable to setup Slide '%s'", config.get(CONF_HOST))
 
 
 class SlideCover(CoverEntity):
