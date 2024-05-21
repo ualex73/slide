@@ -1,9 +1,5 @@
 {
     "services": {
-        "reload": {
-            "description": "Reloads all Slide entities.",
-            "name": "Reload"
-        },
         "calibrate": {
             "description": "Calibrate a Slide.",
             "fields": {

@@ -1,6 +1,4 @@
-reload:
 calibrate:
-  description: "Start calibration of the Slide."
   fields:
     entity_id:
       required: true

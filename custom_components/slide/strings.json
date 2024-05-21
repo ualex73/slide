@@ -1,11 +1,7 @@
 {
     "services": {
-        "reload": {
-            "name": "[%key:common::action::reload%]",
-            "description": "Reloads all Slide entities."
-        },
         "calibrate": {
-            "name": "[%key:common::action::calibrate%]",
+            "name": "Calibrate",
             "description": "Calibrate a Slide.",
             "fields": {
                 "entity_id": {
