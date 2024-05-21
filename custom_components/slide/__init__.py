@@ -32,7 +32,7 @@ CONFIG_SCHEMA = vol.Schema(
 async def async_setup(hass, config):
     """Set up the local Slide platform."""
 
-    if not DOMAIN in config:
+    if DOMAIN not in config:
         _LOGGER.info("Slide not configured")
         return True
 
