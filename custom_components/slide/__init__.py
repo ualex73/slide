@@ -1,11 +1,10 @@
 """Component for the Slide API."""
 
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
-from goslideapi import GoSlideCloud, goslideapi
 import voluptuous as vol
-
+from goslideapi import GoSlideCloud, goslideapi
 from homeassistant.const import (
     CONF_PASSWORD,
     CONF_SCAN_INTERVAL,
