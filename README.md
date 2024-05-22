@@ -30,7 +30,27 @@ NOTE: If a new Slide is installed, it could be the firmware is too old. Configur
 
 ![alt text](https://github.com/ualex73/slide/blob/master/screenshots/slide-bottom.png?raw=true "Screenshot Slide Bottom")
 
-### Usage
+### Local API Usage
+To use this component in your installation With the Local API, add the following to your `configuration.yaml` file for each Slide:
+
+```yaml
+# Example yaml entry
+
+cover:
+  - platform: slide
+    host: 192.168.1.1
+    password: 12345678
+    api_version: 2
+```
+
+Configuration variables:
+
+- **host** (*Required*): The IP address or hostname of your local Slide
+- **password** (*Required*): The device code of your Slide (inside of the Slide or in the box, length is 8 characters). NOTE: With *api_version: 2* you can fill in anything here, it is not used by the local API
+- **invert_position** (*Optional*): If the position should be inverted e.g. 0% -> 100% and 100% -> 0% (default = False)
+- **api_version** (*Optional*): 1 or 2. 1 is pre Aug-2023 firmware. 2 is for Aug-2023 or later (default = 2)
+
+### Cloud API Usage
 To use this component in your installation for the Cloud API, add the following to your `configuration.yaml` file:
 
 ```yaml
@@ -52,28 +72,18 @@ Configuration variables:
 - **invert_position** (*Optional*): If the position should be inverted e.g. 0% -> 100% and 100% -> 0% (default = False)
 - **verify_ssl** (*Optional*): If the SSL certificate should be checked (default = True)
 
-To use this component in your installation With the Local API, add the following to your `configuration.yaml` file for each Slide:
-
-```yaml
-# Example yaml entry
-
-cover:
-  - platform: slide
-    host: 192.168.1.1
-    password: 12345678
-    api_version: 2
-```
-
-Configuration variables:
-
-- **host** (*Required*): The IP address or hostname of your local Slide
-- **password** (*Required*): The device code of your Slide (inside of the Slide or in the box, length is 8 characters). NOTE: With *api_version: 2* you can fill in anything here, it is not used by the local API
-- **invert_position** (*Optional*): If the position should be inverted e.g. 0% -> 100% and 100% -> 0% (default = False)
-- **api_version** (*Optional*): 1 or 2. 1 is pre Aug-2023 firmware. 2 is for Aug-2023 or later (default = 2)
-
 ### Services
 
 - slide.calibrate - It is possible to call this service to calibrate your Slide
+
+### Setup Instructions
+
+Setup video Slide with curtain opening both side: https://www.youtube.com/watch?v=i4TPknt7yqU  
+Setup video Slide with curtain opening single side: https://www.youtube.com/watch?v=iJg2V_yjXv8
+
+### Reset to factory defaults
+
+The reset button is placed in an opening on the bottom of Slide, opposite the opening with the light. Use something like a paperclip to push and hold the reset button for  at least 10 seconds. Slide will return to factory settings and the light will start pulsating (going on and off slowly). The hard reset is now complete.
 
 ### Debugging
 
