@@ -7,7 +7,6 @@ calibrate:
           integration: slide
           domain: cover
 touchgo:
-  description: "Enable or disable Touch Go of the Slide."
   fields:
     entity_id:
       required: true

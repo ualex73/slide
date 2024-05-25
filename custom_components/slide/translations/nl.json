@@ -9,6 +9,20 @@
                 }
             },
             "name": "Kalibreer"
+        },
+        "touchgo": {
+            "description": "Zet Touch Go aan of uit voor een Slide.",
+            "fields": {
+                "entity_id": {
+                    "description": "Entity id van de Slide waar je Touch Go aan of uit wilt zetten.",
+                    "name": "Entity"
+                },
+                "touchgo": {
+                    "description": "Touch Go waarde, kan aan of uit zijn.",
+                    "name": "TouchGo"
+                }
+            },
+            "name": "TouchGo"
         }
     }
 }
