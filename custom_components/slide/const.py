@@ -11,3 +11,4 @@ CONF_INVERT_POSITION = "invert_position"
 DOMAIN = "slide"
 DEFAULT_OFFSET = 0.15
 SERVICE_CALIBRATE = "calibrate"
+SERVICE_TOUCHGO = "touchgo"

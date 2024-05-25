@@ -6,7 +6,7 @@ import logging
 from typing import Any
 
 import voluptuous as vol
-from goslideapi import GoSlideLocal
+from goslideapi import GoSlideLocal, goslideapi
 from homeassistant.components.cover import ATTR_POSITION, CoverDeviceClass, CoverEntity
 from homeassistant.const import (
     ATTR_ENTITY_ID,
@@ -19,6 +19,7 @@ from homeassistant.const import (
     STATE_OPENING,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import PlatformNotReady
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -32,10 +33,16 @@ from .const import (
     DEFAULT_OFFSET,
     DOMAIN,
     SERVICE_CALIBRATE,
+    SERVICE_TOUCHGO,
 )
 
 SERVICE_SCHEMA_CALIBRATE = {
     vol.Required(ATTR_ENTITY_ID): cv.entity_ids,
+}
+
+SERVICE_SCHEMA_TOUCHGO = {
+    vol.Required(ATTR_ENTITY_ID): cv.entity_ids,
+    vol.Required(ATTR_TOUCHGO): cv.boolean,
 }
 
 _LOGGER = logging.getLogger(__name__)
@@ -58,6 +65,12 @@ async def async_setup_platform(
         "async_calibrate",
     )
 
+    platform.async_register_entity_service(
+        SERVICE_TOUCHGO,
+        SERVICE_SCHEMA_TOUCHGO,
+        "async_touchgo",
+    )
+
     if API not in hass.data[DOMAIN]:
         hass.data[DOMAIN][API] = GoSlideLocal()
 
@@ -73,7 +86,12 @@ async def async_setup_platform(
             cover[CONF_HOST], cover[CONF_PASSWORD], cover[CONF_API_VERSION]
         )
 
-        slide_info = await hass.data[DOMAIN][API].slide_info(cover[CONF_HOST])
+        try:
+            slide_info = await hass.data[DOMAIN][API].slide_info(cover[CONF_HOST])
+        except (goslideapi.ClientConnectionError) as err:
+            raise PlatformNotReady(
+                f"Unable to setup Slide '{cover[CONF_HOST]}': {err}"
+            ) from err
 
         if slide_info is not None:
             _LOGGER.debug("Setup Slide '%s' successful", cover[CONF_HOST])
@@ -254,3 +272,7 @@ class SlideCover(CoverEntity):
     async def async_calibrate(self) -> None:
         """Calibrate the Slide."""
         await self._api.slide_calibrate(self._id)
+
+    async def async_touchgo(self, **kwargs) -> None:
+        """TouchGo the Slide."""
+        await self._api.slide_set_touchgo(self._id, kwargs[ATTR_TOUCHGO])
