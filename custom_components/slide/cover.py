@@ -37,6 +37,7 @@ from .const import (
     DEFAULT_OFFSET,
     DOMAIN,
     SERVICE_CALIBRATE,
+    SERVICE_TOUCHGO,
     SLIDES,
 )
 
@@ -52,6 +53,11 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 
 SERVICE_SCHEMA_CALIBRATE = {
     vol.Required(ATTR_ENTITY_ID): cv.entity_ids,
+}
+
+SERVICE_SCHEMA_TOUCHGO = {
+    vol.Required(ATTR_ENTITY_ID): cv.entity_ids,
+    vol.Required(ATTR_TOUCHGO): cv.boolean,
 }
 
 _LOGGER = logging.getLogger(__name__)
@@ -72,6 +78,12 @@ async def async_setup_platform(
         SERVICE_CALIBRATE,
         SERVICE_SCHEMA_CALIBRATE,
         "async_calibrate",
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_TOUCHGO,
+        SERVICE_SCHEMA_TOUCHGO,
+        "async_touchgo",
     )
 
     if discovery_info is None:
@@ -386,3 +398,7 @@ class SlideCoverLocal(CoverEntity):
     async def async_calibrate(self) -> None:
         """Calibrate the Slide."""
         await self._api.slide_calibrate(self._id)
+
+    async def async_touchgo(self, **kwargs) -> None:
+        """TouchGo the Slide."""
+        await self._api.slide_set_touchgo(self._id, kwargs[ATTR_TOUCHGO])
