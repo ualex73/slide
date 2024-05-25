@@ -4,7 +4,7 @@ import logging
 from typing import Any
 
 import voluptuous as vol
-from goslideapi import GoSlideCloud, GoSlideLocal
+from goslideapi import GoSlideCloud, GoSlideLocal, goslideapi
 
 from homeassistant.components.cover import (
     ATTR_POSITION,
@@ -23,6 +23,7 @@ from homeassistant.const import (
     STATE_OPENING,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import PlatformNotReady
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -106,7 +107,13 @@ async def async_setup_platform(
             cover[CONF_HOST], cover[CONF_PASSWORD], cover[CONF_API_VERSION]
         )
 
-        slide_info = await hass.data[DOMAIN][API_LOCAL].slide_info(cover[CONF_HOST])
+        try:
+            slide_info = await hass.data[DOMAIN][API_LOCAL].slide_info(cover[CONF_HOST])
+        except (goslideapi.ClientConnectionError) as err:
+            # https://developers.home-assistant.io/docs/integration_setup_failures/
+            raise PlatformNotReady(
+                f"Unable to setup Slide '{cover[CONF_HOST]}': {err}"
+            ) from err
 
         if slide_info is not None:
             _LOGGER.debug("Setup Slide '%s' successful", cover[CONF_HOST])
