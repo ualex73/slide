@@ -5,6 +5,6 @@
   "documentation": "https://www.home-assistant.io/integrations/slide",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/ualex73/slide/issues",
-  "requirements": ["goslide-api==0.6.9"],
+  "requirements": ["goslide-api==0.7.0"],
   "version": "1.5"
 }

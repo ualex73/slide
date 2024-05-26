@@ -109,7 +109,7 @@ async def async_setup_platform(
 
         try:
             slide_info = await hass.data[DOMAIN][API_LOCAL].slide_info(cover[CONF_HOST])
-        except (goslideapi.ClientConnectionError) as err:
+        except (goslideapi.ClientConnectionError, goslideapi.ClientTimeoutError) as err:
             # https://developers.home-assistant.io/docs/integration_setup_failures/
             raise PlatformNotReady(
                 f"Unable to setup Slide '{cover[CONF_HOST]}': {err}"
@@ -348,24 +348,36 @@ class SlideCoverLocal(CoverEntity):
     async def async_update(self) -> None:
         """Update slide information."""
 
-        slide = await self._api.slide_info(self._id)
-        self.parsedata(slide)
+        slide_info = None
 
-    def parsedata(self, slide) -> None:
+        try:
+            slide_info = await self._api.slide_info(self._id)
+            self.parsedata(slide_info)
+        except (goslideapi.ClientConnectionError, goslideapi.ClientTimeoutError) as err:
+            # Set Slide to unavailable
+            self._slide["online"] = False
+
+            _LOGGER.error(
+                "Unable to get information from Slide '%s': %s",
+                self._id,
+                str(err),
+            )
+
+    def parsedata(self, slide_info) -> None:
 
         self._slide["online"] = False
 
-        if slide is None:
+        if slide_info is None:
             _LOGGER.error("Slide '%s' returned no data (offline?)", self._id)
             return
 
-        if "pos" in slide:
+        if "pos" in slide_info:
             if self._unique_id is None:
-                self._unique_id = slide["slide_id"]
+                self._unique_id = slide_info["slide_id"]
             oldpos = self._slide.get("pos")
             self._slide["online"] = True
-            self._slide["touchgo"] = slide["touch_go"]
-            self._slide["pos"] = slide["pos"]
+            self._slide["touchgo"] = slide_info["touch_go"]
+            self._slide["pos"] = slide_info["pos"]
             self._slide["pos"] = max(0, min(1, self._slide["pos"]))
 
             if oldpos is None or oldpos == self._slide["pos"]:
@@ -387,7 +399,7 @@ class SlideCoverLocal(CoverEntity):
                     else STATE_OPENING
                 )
         else:
-            _LOGGER.error("Slide '%s' has invalid data %s", self._id, str(slide))
+            _LOGGER.error("Slide '%s' has invalid data %s", self._id, str(slide_info))
 
         # The format is:
         # {
