@@ -81,7 +81,7 @@ Configuration variables:
 Setup video Slide with curtain opening both side: https://www.youtube.com/watch?v=i4TPknt7yqU  
 Setup video Slide with curtain opening single side: https://www.youtube.com/watch?v=iJg2V_yjXv8
 
-There is also a Reddit thread, with usefull Slide information. The URL to it is: https://www.reddit.com/r/slidecurtains/
+There is also a Reddit community created, with usefull Slide information. The URL to it is: https://www.reddit.com/r/slidecurtains/
 
 ### Reset to factory defaults
 
