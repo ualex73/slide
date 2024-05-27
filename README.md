@@ -75,6 +75,7 @@ Configuration variables:
 ### Services
 
 - slide.calibrate - It is possible to call this service to calibrate your Slide
+- slide.touchgo - Enable or disable the Slide TouchGo feature
 
 ### Setup Instructions
 
