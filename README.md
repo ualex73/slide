@@ -1,6 +1,6 @@
 # Home-Assistant Custom Component for Slide
 
-This custom component home-assistant (http://www.home-assistant.io) can control the Slide (https://slide.store).
+This custom component home-assistant (http://www.home-assistant.io) can control the Slide (https://slide.store). NOTE: slide has stopped their business and it is unknown when the Cloud API stops working (currently paid until 30-June-2024)
 
 ## Slide
 
@@ -26,7 +26,7 @@ By default the Slide connects to the cloud API, but it is possible to use the lo
 LED flashes 5x fast: cloud API disabled, local API enabled  
 LED flashes 2x slow: local API disabled, cloud API enabled
 
-NOTE: If a new Slide is installed, it could be the firmware is too old. Configure it via the cloud API and wait a few days (or contact Slide support to push a newer firmware).
+NOTE: If a new Slide is installed, it could be the firmware is too old. Configure it via the cloud API and wait a few days.
 
 ![alt text](https://github.com/ualex73/slide/blob/master/screenshots/slide-bottom.png?raw=true "Screenshot Slide Bottom")
 
@@ -48,7 +48,10 @@ Configuration variables:
 - **host** (*Required*): The IP address or hostname of your local Slide
 - **password** (*Required*): The device code of your Slide (inside of the Slide or in the box, length is 8 characters). NOTE: With *api_version: 2* you can fill in anything here, it is not used by the local API
 - **invert_position** (*Optional*): If the position should be inverted e.g. 0% -> 100% and 100% -> 0% (default = False)
-- **api_version** (*Optional*): 1 or 2. 1 is pre Aug-2023 firmware. 2 is for Aug-2023 or later (default = 2)
+- **api_version** (*Optional*): The local API version, this is 1 or 2. Firmware version 0.13.8 and 2.0 are using API version 2, all other are using API version 1.  (default = 2)
+
+NOTE: You cannot determine the firmware yourself. If API version 2 does not work, try API version 1. In the following reddit there is a spreadsheet with all known slides and their firmeware version:
+https://www.reddit.com/r/slidecurtains/comments/1cwc5u2/which_firmware_version_does_your_slide_have/
 
 ### Cloud API Usage
 To use this component in your installation for the Cloud API, add the following to your `configuration.yaml` file:
