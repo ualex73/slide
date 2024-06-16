@@ -77,7 +77,7 @@ Configuration variables:
 
 ### Device visibility in Home Assistant
 
-The Slide integration device, local or cloud, is not shown in "Settings -> Devices & Services -> Devices". To see the Slide device information go to "Developer tools -> States" and search for "cover".
+The Slide integration device, local or cloud, is not shown in `Settings -> Devices & Services -> Devices`. To see the Slide device information go to `Developer tools -> States` and search for `cover`.
 
 ### Services
 
