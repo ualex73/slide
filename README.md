@@ -75,6 +75,10 @@ Configuration variables:
 - **invert_position** (*Optional*): If the position should be inverted e.g. 0% -> 100% and 100% -> 0% (default = False)
 - **verify_ssl** (*Optional*): If the SSL certificate should be checked (default = True)
 
+### Device visibility in Home Assistant
+
+The Slide integration device, local or cloud, is not shown in "Settings -> Devices & Services -> Devices". To see the Slide device information go to "Developer tools -> States" and search for "cover".
+
 ### Services
 
 - slide.calibrate - It is possible to call this service to calibrate your Slide
