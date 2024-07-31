@@ -7,6 +7,24 @@ calibrate:
         entity:
           integration: slide
           domain: cover
+
+strength:
+  description: "Change motor strength of the Slide, HIGHLY EXPERIMENTAL, use at own risk."
+  fields:
+    entity_id:
+      required: true
+      selector:
+        entity:
+          integration: slide
+          domain: cover
+    strength:
+      required: true
+      selector:
+        select:
+          options:
+            - "light"
+            - "medium"
+
 touchgo:
   description: "Enable or disable Touch Go of the Slide."
   fields:

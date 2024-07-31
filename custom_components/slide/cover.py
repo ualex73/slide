@@ -32,12 +32,14 @@ from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from .const import (
     API_CLOUD,
     API_LOCAL,
+    ATTR_STRENGTH,
     ATTR_TOUCHGO,
     CONF_API_VERSION,
     CONF_INVERT_POSITION,
     DEFAULT_OFFSET,
     DOMAIN,
     SERVICE_CALIBRATE,
+    SERVICE_STRENGTH,
     SERVICE_TOUCHGO,
     SLIDES,
 )
@@ -54,6 +56,11 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
 
 SERVICE_SCHEMA_CALIBRATE = {
     vol.Required(ATTR_ENTITY_ID): cv.entity_ids,
+}
+
+SERVICE_SCHEMA_STRENGTH = {
+    vol.Required(ATTR_ENTITY_ID): cv.entity_ids,
+    vol.Required(ATTR_STRENGTH): cv.string,
 }
 
 SERVICE_SCHEMA_TOUCHGO = {
@@ -79,6 +86,12 @@ async def async_setup_platform(
         SERVICE_CALIBRATE,
         SERVICE_SCHEMA_CALIBRATE,
         "async_calibrate",
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_STRENGTH,
+        SERVICE_SCHEMA_STRENGTH,
+        "async_strength",
     )
 
     platform.async_register_entity_service(
@@ -417,6 +430,20 @@ class SlideCoverLocal(CoverEntity):
     async def async_calibrate(self) -> None:
         """Calibrate the Slide."""
         await self._api.slide_calibrate(self._id)
+
+    async def async_strength(self, **kwargs) -> None:
+        """Motor strength for the Slide. At this moment only light and medium supported."""
+
+        if kwargs[ATTR_STRENGTH] == "light":
+            await self._api.slide_set_motor_strength(self._id, 900, 850)
+        elif kwargs[ATTR_STRENGTH] == "medium":
+            await self._api.slide_set_motor_strength(self._id, 1250, 1200)
+        else:
+            _LOGGER.error(
+                "Slide '%s' length '%s' is invalid. Only 'light' and 'medium' are supported",
+                self._id,
+                kwargs[ATTR_STRENGTH],
+            )
 
     async def async_touchgo(self, **kwargs) -> None:
         """TouchGo the Slide."""

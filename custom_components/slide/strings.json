@@ -10,6 +10,20 @@
                 }
             }
         },
+        "strength": {
+            "description": "Change motor strength of the Slide, HIGHLY EXPERIMENTAL, use at own risk.",
+            "fields": {
+                "entity_id": {
+                    "description": "Entity id of the Slide cover to change motor strength.",
+                    "name": "Entity"
+                },
+                "strength": {
+                    "description": "Strength value. Currently only supported light and medium.",
+                    "name": "Strength"
+                }
+            },
+            "name": "Strength"
+        },
         "touchgo": {
             "name": "TouchGo",
             "description": "Enable or disable Touch Go of the Slide.",

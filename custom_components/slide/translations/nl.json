@@ -10,6 +10,20 @@
             },
             "name": "Kalibreer"
         },
+        "strength": {
+            "description": "Verander motor sterkte van de slide, HIGHLY EXPERIMENTAL, gebruik op eigen risico.",
+            "fields": {
+                "entity_id": {
+                    "description": "Entity id van de slide cover waarvan je de motor sterkte wilt veranderen.",
+                    "name": "Entity"
+                },
+                "strength": {
+                    "description": "Sterkte waarden. Op dit moment is alleen light en medium ondersteund.",
+                    "name": "Strength"
+                }
+            },
+            "name": "Sterkte"
+        },
         "touchgo": {
             "description": "Zet Touch Go aan of uit voor een Slide.",
             "fields": {

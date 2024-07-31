@@ -4,6 +4,7 @@ from homeassistant.const import Platform
 
 API_CLOUD = "api_cloud"
 API_LOCAL = "api_local"
+ATTR_STRENGTH = "strength"
 ATTR_TOUCHGO = "touchgo"
 COMPONENT_PLATFORM = Platform.COVER
 CONF_API_VERSION = "api_version"
@@ -15,4 +16,5 @@ SLIDES_LOCAL = "slides_local"
 DEFAULT_OFFSET = 0.15
 DEFAULT_RETRY = 120
 SERVICE_CALIBRATE = "calibrate"
+SERVICE_STRENGTH = "strength"
 SERVICE_TOUCHGO = "touchgo"
