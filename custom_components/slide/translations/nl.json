@@ -18,7 +18,7 @@
                     "name": "Entity"
                 },
                 "strength": {
-                    "description": "Sterkte waarden. Op dit moment is alleen light en medium ondersteund.",
+                    "description": "Sterkte waarden. Ondersteunt zijn light, medium en strong.",
                     "name": "Strength"
                 }
             },

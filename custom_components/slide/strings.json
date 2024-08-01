@@ -18,7 +18,7 @@
                     "name": "Entity"
                 },
                 "strength": {
-                    "description": "Strength value. Currently only supported light and medium.",
+                    "description": "Strength value.Supported are light, medium or strong.",
                     "name": "Strength"
                 }
             },

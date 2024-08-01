@@ -432,15 +432,23 @@ class SlideCoverLocal(CoverEntity):
         await self._api.slide_calibrate(self._id)
 
     async def async_strength(self, **kwargs) -> None:
-        """Motor strength for the Slide. At this moment only light and medium supported."""
+        """Motor strength for the Slide. Value can be light, medium or strong."""
 
         if kwargs[ATTR_STRENGTH] == "light":
-            await self._api.slide_set_motor_strength(self._id, 900, 850)
+            await self._api.slide_set_motor_strength(
+                self._id, maxcurrent=900, calib_current=850
+            )
         elif kwargs[ATTR_STRENGTH] == "medium":
-            await self._api.slide_set_motor_strength(self._id, 1250, 1200)
+            await self._api.slide_set_motor_strength(
+                self._id, maxcurrent=1250, calib_current=1200
+            )
+        elif kwargs[ATTR_STRENGTH] == "strong":
+            await self._api.slide_set_motor_strength(
+                self._id, maxcurrent=1500, calib_current=1450
+            )
         else:
             _LOGGER.error(
-                "Slide '%s' length '%s' is invalid. Only 'light' and 'medium' are supported",
+                "Slide '%s' length '%s' is invalid. Only 'light', 'medium' or 'string' is supported",
                 self._id,
                 kwargs[ATTR_STRENGTH],
             )
